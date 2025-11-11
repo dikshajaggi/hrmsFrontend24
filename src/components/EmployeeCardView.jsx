@@ -142,6 +142,7 @@ const EmployeeCardView = ({ employees }) => {
           window.innerWidth - 60,
           CARD_WIDTH * columnCount + GRID_GAP * (columnCount - 1)
         )}
+        className="m-auto"
       >
         {Cell}
       </Grid>

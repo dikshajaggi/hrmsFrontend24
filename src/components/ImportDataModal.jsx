@@ -1,6 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const ImportDataModal = ({setShowModal, uploadStage, handleFileChange, fileName, handleImportClick}) => {
+const ImportDataModal = ({setShowModal}) => {
+
+  const [uploadStage, setUploadStage] = useState("upload"); // upload | importing | success
+  const [fileName, setFileName] = useState("");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileName(file.name);
+      setUploadStage("importing");
+
+      // Simulate import delay
+      setTimeout(() => {
+        setUploadStage("success");
+      }, 2000);
+    }
+  };
+
+  const handleImportClick = () => {
+    if (uploadStage === "success") {
+      setShowModal(false);
+      setUploadStage("upload");
+      setFileName("");
+    }
+  };
+
+
   return (
      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4 sm:px-0">
         <div className="bg-white rounded-xl shadow-lg w-full sm:w-[90%] max-w-md p-4 sm:p-6 relative">

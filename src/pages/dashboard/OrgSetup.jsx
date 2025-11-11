@@ -8,10 +8,12 @@ import {
   MapPin,
   Badge,
 } from "lucide-react";
+import ImportDataModal from "@/components/ImportDataModal";
 
 const OrgSetup = () => {
     
     const [activeTab, setActiveTab] = useState("branches");
+    const [showModal, setShowModal] = useState(false);
 
     const tabs = [
         { id: "branches", label: "Branches", icon: <Building2 size={16} /> },
@@ -67,12 +69,18 @@ const OrgSetup = () => {
             Add {activeTab === "project-sites" ? "Site" : activeTab === "branches" ? "Branch" : activeTab.slice(0, -1)}
           </button>
 
-          <button className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition cursor-pointer">
+          <button onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition cursor-pointer">
             <Upload size={16} />
             Upload Data
           </button>
         </div>
       </div>
+
+      {/* Upload Modal */}
+      {showModal && (
+        <ImportDataModal setShowModal={setShowModal}  />
+      )}
 
       {/* Table Placeholder */}
       <div className="bg-white border border-gray-100 rounded-xl shadow-sm p-4 sm:p-6 text-center text-gray-500 text-sm">
