@@ -5,7 +5,7 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import ExportDataModal from "./ExportDataModal";
+import ExportDataModal from "./common/ExportDataModal";
 import { Search, User, Building2, MapPin, Briefcase, Users } from "lucide-react";
 import SearchExportData from "./SearchExportData";
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import EmployeeTableView from "./EmployeeTableView";
 import EmployeeCardView from "./EmployeeCardView";
 import { LayoutGrid, LayoutList } from "lucide-react";
-import ModernSelect from "./ModernSelect";
+import ModernSelect from "./common/ModernSelect";
 
 const EmployeeList = () => {
   const [view, setView] = useState("table");

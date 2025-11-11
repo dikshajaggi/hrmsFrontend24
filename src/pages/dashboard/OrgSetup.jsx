@@ -8,7 +8,7 @@ import {
   MapPin,
   Badge,
 } from "lucide-react";
-import ImportDataModal from "@/components/ImportDataModal";
+import ImportDataModal from "@/components/common/ImportDataModal";
 
 const OrgSetup = () => {
     

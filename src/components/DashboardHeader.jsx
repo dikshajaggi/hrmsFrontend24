@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Bell, Sun, Moon } from "lucide-react"
-import ExpandableSearch from './ExpandableSearch'
+import ExpandableSearch from './common/ExpandableSearch'
 
 const DashboardHeader = () => {
   const [dateTime, setDateTime] = useState(new Date());
