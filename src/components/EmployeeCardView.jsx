@@ -10,6 +10,7 @@ import {
 import * as ReactWindow from "react-window";
 import SearchExportData from "./SearchExportData";
 import ExportDataModal from "./common/ExportDataModal";
+import { useNavigate } from "react-router-dom";
 console.log("ReactWindow exports:", ReactWindow);
 
 
@@ -100,6 +101,7 @@ const EmployeeCardView = ({ employees }) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const navigate = useNavigate()
 
   const columnCount = useMemo(() => {
     if (window.innerWidth >= 1024) return 3;
@@ -150,69 +152,45 @@ const EmployeeCardView = ({ employees }) => {
       {/* Slide-in Details Panel */}
       {selectedEmployee && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex justify-end z-50">
-          <div className="bg-white w-full sm:w-[400px] h-full shadow-xl border-l border-gray-100 p-6 relative animate-slideIn">
-            <button
-              onClick={() => setSelectedEmployee(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <X size={18} />
-            </button>
+          <div className="bg-white w-full sm:w-[700px] h-full shadow-xl border-l border-gray-100 p-6 relative animate-slideIn flex flex-col">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <img
+                  src={selectedEmployee.image || "https://via.placeholder.com/80"}
+                  alt={selectedEmployee.name}
+                  className="w-16 h-16 rounded-full object-cover border"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">{selectedEmployee.name}</h3>
+                  <p className="text-sm text-gray-500">{selectedEmployee.designation}</p>
+                </div>
+              </div>
 
-            <div className="flex flex-col items-center text-center mt-6">
-              <img
-                src={
-                  selectedEmployee.image || "https://via.placeholder.com/80"
-                }
-                alt={selectedEmployee.name}
-                className="w-16 h-16 rounded-full object-cover border border-gray-200"
-              />
-              <h3 className="mt-3 text-lg font-semibold text-gray-800">
-                {selectedEmployee.name}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {selectedEmployee.department}
-              </p>
-              <span
-                className={`mt-2 px-3 py-0.5 text-xs rounded-full font-medium ${
-                  selectedEmployee.status === "Inactive"
-                    ? "bg-gray-100 text-gray-600"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {selectedEmployee.status || "Active"}
-              </span>
+              <div className="flex items-center gap-2">
+                {/* View full profile button */}
+                <button
+                  // onClick={() => navigate(`/employee/${selectedEmployee.id}`)}
+                  className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium cursor-not-allowed"
+                >
+                  Full Profile
+                  <ArrowRight size={14} />
+                </button>
+
+                {/* Close */}
+                <button
+                  onClick={() => setSelectedEmployee(null)}
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
-            <div className="mt-6 space-y-3 text-sm text-gray-700">
-              <div className="flex items-center gap-3">
-                <Building2 size={16} className="text-gray-400" />
-                <span>{selectedEmployee.branch}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin size={16} className="text-gray-400" />
-                <span>{selectedEmployee.projectSite}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail size={16} className="text-gray-400" />
-                <a
-                  href={`mailto:${selectedEmployee.email}`}
-                  className="text-blue-600 hover:underline truncate"
-                >
-                  {selectedEmployee.email}
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-400 text-[13px]">Joined:</span>
-                <span className="font-medium text-gray-700">
-                  {selectedEmployee.joined || "N/A"}
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-gray-400 text-[13px]">Gender:</span>
-                <span className="font-medium text-gray-700">
-                  {selectedEmployee.gender}
-                </span>
-              </div>
+            {/* Tabs or summary content here */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Add mini tabs or summary info */}
             </div>
           </div>
         </div>

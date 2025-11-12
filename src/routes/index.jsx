@@ -32,6 +32,13 @@ const router = createBrowserRouter([
         ]
       },
       {
+        path: "employee",
+        // element: <EmployeeLayout />,
+        children: [
+
+        ]
+      },
+      {
         path: "dashboard",
         element: <DashboardLayout />,
         children: [
