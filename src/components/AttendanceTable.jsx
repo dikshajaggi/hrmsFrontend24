@@ -95,7 +95,10 @@ function AttendanceCell({ value, disabled, onChange }) {
 // =======================
 //  MAIN TABLE
 // =======================
-export default function AttendanceTable({ apiUrl, initialMonth = new Date(), bankHolidays = [], saturdayOffs = [] }) {
+export default function AttendanceTable({ apiUrl, initialMonth = new Date(), bankHolidays = [], saturdayOffs = [
+    { "date": "2025-11-08", "week": 2 },
+    { "date": "2025-11-22", "week": 4 }
+] }) {
   // --- UI / Data state
   const [employees, setEmployees] = useState([]);
   const [attendance, setAttendance] = useState({}); // { empId: { 'yyyy-MM-dd': 'P' }}
@@ -353,7 +356,7 @@ export default function AttendanceTable({ apiUrl, initialMonth = new Date(), ban
         </table>
       </div>
 
-      <div className="mt-3 text-sm text-gray-600">Tip: Sundays are auto-marked as <strong>H</strong> (Holiday). Saturday offs / Bank holidays from API are applied automatically.</div>
+      <div className="mt-3 text-sm text-gray-600"> * Sundays are auto-marked as <strong>H</strong> (Holiday). Saturday offs / Bank holidays are applied automatically.</div>
     </div>
   );
 }
