@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import EmployeeTableView from "./EmployeeTableView";
 import EmployeeCardView from "./EmployeeCardView";
 import { LayoutGrid, LayoutList } from "lucide-react";
@@ -21,9 +21,34 @@ const EmployeeList = () => {
     gender: "",
   });
 
-  const branches = ["All", "Delhi", "Mumbai", "Bangalore"];
-  const departments = ["All", "Accounts", "HR", "Engineering", "Sales"];
-  const sites = ["All", "Dwarka", "Noida", "Andheri", "Electronic City"];
+    // using useMemo ->
+    // To avoid recalculating on every render
+    // It updates only when employees change (like after import)
+
+  const branches = useMemo(() => {
+    const items = employees
+      .map(emp => emp.branch?.branch_name)
+      .filter(Boolean); 
+    
+    return ["All", ...new Set(items)];
+  }, [employees]);
+
+  const departments = useMemo(() => {
+    const items = employees
+      .map(emp => emp.department?.department_name)
+      .filter(Boolean); 
+    
+    return ["All", ...new Set(items)];
+  }, [employees]);
+
+  const sites = useMemo(() => {
+    const items = employees
+      .map(emp => emp.projectSite?.site_name)
+      .filter(Boolean);
+
+    return ["All", ...new Set(items)];
+  }, [employees]);
+
 
   // const employees = [
   //   {
@@ -138,17 +163,18 @@ const EmployeeList = () => {
 
 
   console.log(employees, "employees")
-
-  const filteredEmployees = employees.filter((emp) => {
-    return (
-      (filters.branch === "" || filters.branch === "All" || emp.branch === filters.branch) &&
-      (filters.department === "" || filters.department === "All" || emp.department === filters.department) &&
-      (filters.projectSite === "" || filters.projectSite === "All" || emp.projectSite === filters.projectSite) &&
-      (filters.gender === "" || filters.gender === "All" || emp.gender === filters.gender)
-    );
-  });
-
   
+  const filteredEmployees = useMemo(() => {
+    return employees.filter((emp) => {
+      return (
+        (filters.branch === "" || filters.branch === "All" || emp.branch?.branch_name.toLowerCase() === filters.branchtoLowerCase()) &&
+        (filters.department === "" || filters.department === "All" || emp.department?.department_name.toLowerCase() === filters.department.toLowerCase()) &&
+        (filters.projectSite === "" || filters.projectSite === "All" || emp.projectSite?.site_name.toLowerCase() === filters.projectSite.toLowerCase()) &&
+        (filters.gender === "" || filters.gender === "All" || emp.gender.toLowerCase() === filters.gender.toLowerCase())
+      );
+    });
+  }, [employees, filters]);
+
   if (isLoading) {
     return (
       <div className="bg-white p-6 rounded-xl text-center">
