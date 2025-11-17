@@ -1,30 +1,62 @@
+import { importData } from '@/apis';
 import { X } from 'lucide-react';
 import React, { useState } from 'react'
+import { useMutation } from 'react-query';
 
-const ImportDataModal = ({setShowModal}) => {
+const ImportDataModal = ({setShowModal, importType, onSuccess}) => {
 
   const [uploadStage, setUploadStage] = useState("upload"); // upload | importing | success
   const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState(null);
+  const [summary, setSummary] = useState(null);
+
+  console.log(importType, fileName, file, summary, "filefilefile")
+
+  const mutation = useMutation({
+    mutationFn: (formData) => importData(importType, formData),
+
+    onMutate: () => {
+      setUploadStage("importing");
+    },
+
+    onSuccess: (data) => {
+      setSummary(data.data.summary); 
+      setUploadStage("result");
+
+      // Refetch parent list (employees or attendance)
+      if (onSuccess) onSuccess();
+
+      // Auto close modal after 1 sec
+      // setTimeout(() => {
+      //   setShowModal(false);
+      //   setUploadStage("upload");
+      //   setFileName("");
+      //   setFile(null);
+      // }, 1000);
+    },
+
+    onError: () => {
+      setUploadStage("error");
+    },
+  });
+
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFileName(file.name);
-      setUploadStage("importing");
+    const selected = e.target.files[0];
+    if (!selected) return;
 
-      // Simulate import delay
-      setTimeout(() => {
-        setUploadStage("success");
-      }, 2000);
-    }
+    setFile(selected);
+    setFileName(selected.name);
+    setUploadStage("file-selected")
   };
 
   const handleImportClick = () => {
-    if (uploadStage === "success") {
-      setShowModal(false);
-      setUploadStage("upload");
-      setFileName("");
-    }
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    mutation.mutate(formData);
   };
 
 
@@ -33,8 +65,13 @@ const ImportDataModal = ({setShowModal}) => {
         <div className="bg-white rounded-xl shadow-lg w-full sm:w-[90%] max-w-md p-4 sm:p-6 relative">
           <button
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 cursor-pointer"
-            onClick={() => setShowModal(false)}
-          >
+            onClick={() => {
+              setShowModal(false);
+              setUploadStage("upload");
+              setFileName("");
+              setFile(null);
+            }}
+            >
             <X size={18} />
           </button>
 
@@ -42,7 +79,7 @@ const ImportDataModal = ({setShowModal}) => {
 
           {/* Upload Section */}
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center text-center">
-            {uploadStage === "upload" && (
+            {(uploadStage === "upload")  && (
               <>
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/732/732220.png"
@@ -67,6 +104,12 @@ const ImportDataModal = ({setShowModal}) => {
               </>
             )}
 
+            {uploadStage === "file-selected" && (
+              <p className="text-gray-700 mt-2">
+                Selected file: <span className="font-medium">{fileName}</span>
+              </p>
+            )}
+
             {uploadStage === "importing" && (
               <>
                 <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-400 border-t-transparent mb-3"></div>
@@ -89,6 +132,39 @@ const ImportDataModal = ({setShowModal}) => {
                   Chosen file: <span className="font-medium">{fileName}</span>
                 </p>
               </>
+            )}
+
+            {uploadStage === "result" && (
+              <div className="w-full text-left">
+                <p className="text-lg font-semibold text-gray-800 mb-2">
+                  Import Summary
+                </p>
+
+                <p className="text-sm text-gray-700">
+                  <b>Successful:</b> {summary?.successCount}
+                </p>
+
+                <p className="text-sm text-red-600 mt-1">
+                  <b>Failed:</b> {summary?.failedCount}
+                </p>
+
+                {summary?.failedCount > 0 && (
+                  <div className="mt-3 bg-red-50 border border-red-200 p-3 rounded-lg max-h-40 overflow-y-auto">
+                    <p className="font-medium text-red-700 mb-2">Errors:</p>
+
+                    {summary.errors.map((err, idx) => (
+                      <div key={idx} className="mb-2">
+                        <p className="text-sm text-gray-800">
+                          <b>Row {err.rowNumber}:</b>
+                        </p>
+                        <p className="text-xs text-gray-600 whitespace-pre-wrap pl-2">
+                          {err.error}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
@@ -116,15 +192,21 @@ const ImportDataModal = ({setShowModal}) => {
           <div className="mt-6 flex justify-end gap-3">
             <button
               className="flex items-center gap-2 border border-gray-400 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition cursor-pointer"
-              onClick={() => setShowModal(false)}
-            >
-              Cancel
+               onClick={() => {
+                  setShowModal(false);
+                  setSummary(null);
+                  setUploadStage("upload");
+                  setFileName("");
+                  setFile(null);
+                }}
+              >
+              Close
             </button>
             <button
-              disabled={uploadStage === "upload"}
+              disabled={uploadStage !== "file-selected"}
               onClick={handleImportClick}
               className={`px-4 py-2 rounded-lg text-white ${
-                uploadStage === "success"
+                uploadStage === "file-selected"
                   ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
                   : "bg-blue-400 cursor-not-allowed"
               }`}

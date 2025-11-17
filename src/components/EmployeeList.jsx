@@ -3,8 +3,16 @@ import EmployeeTableView from "./EmployeeTableView";
 import EmployeeCardView from "./EmployeeCardView";
 import { LayoutGrid, LayoutList } from "lucide-react";
 import ModernSelect from "./common/ModernSelect";
+import { getEmployees } from "@/apis";
+import { useQuery } from "react-query";
 
 const EmployeeList = () => {
+
+  const { data: employees = [], isLoading } = useQuery(
+    ["employees"],
+    getEmployees,
+    { refetchOnWindowFocus: false }
+  );
   const [view, setView] = useState("table");
   const [filters, setFilters] = useState({
     branch: "",
@@ -17,117 +25,119 @@ const EmployeeList = () => {
   const departments = ["All", "Accounts", "HR", "Engineering", "Sales"];
   const sites = ["All", "Dwarka", "Noida", "Andheri", "Electronic City"];
 
-  const employees = [
-    {
-      id: 1,
-      name: "Aditi Sharma",
-      gender: "Female",
-      branch: "Delhi",
-      department: "HR",
-      designation: "HR Executive",
-      projectSite: "Dwarka",
-    },
-    {
-      id: 2,
-      name: "Rohan Verma",
-      gender: "Male",
-      branch: "Mumbai",
-      department: "Accounts",
-      designation: "Senior Accountant",
-      projectSite: "Andheri",
-    },
-    {
-      id: 3,
-      name: "Kavita Das",
-      gender: "Female",
-      branch: "Bangalore",
-      department: "IT",
-      designation: "Software Developer",
-      projectSite: "Electronic City",
-    },
-    {
-      id: 4,
-      name: "Vikas Mehta",
-      gender: "Male",
-      branch: "Delhi",
-      department: "Sales",
-      designation: "Sales Manager",
-      projectSite: "Noida",
-    },
-    {
-      id: 5,
-      name: "Pooja Nair",
-      gender: "Female",
-      branch: "Mumbai",
-      department: "HR",
-      designation: "Recruiter",
-      projectSite: "Andheri",
-    },
-    {
-      id: 6,
-      name: "Arjun Patel",
-      gender: "Male",
-      branch: "Bangalore",
-      department: "Engineering",
-      designation: "Frontend Developer",
-      projectSite: "Whitefield",
-    },
-    {
-      id: 7,
-      name: "Sneha Iyer",
-      gender: "Female",
-      branch: "Delhi",
-      department: "Marketing",
-      designation: "Content Strategist",
-      projectSite: "Dwarka",
-    },
-    {
-      id: 8,
-      name: "Ritesh Gupta",
-      gender: "Male",
-      branch: "Mumbai",
-      department: "Engineering",
-      designation: "Backend Developer",
-      projectSite: "Andheri",
-    },
-    {
-      id: 9,
-      name: "Priya Menon",
-      gender: "Female",
-      branch: "Bangalore",
-      department: "Accounts",
-      designation: "Finance Associate",
-      projectSite: "Electronic City",
-    },
-    {
-      id: 10,
-      name: "Karan Singh",
-      gender: "Male",
-      branch: "Delhi",
-      department: "IT",
-      designation: "System Administrator",
-      projectSite: "Noida",
-    },
-    {
-      id: 11,
-      name: "Neha Kapoor",
-      gender: "Female",
-      branch: "Mumbai",
-      department: "Sales",
-      designation: "Business Development Executive",
-      projectSite: "Andheri",
-    },
-    {
-      id: 12,
-      name: "Ravi Deshmukh",
-      gender: "Male",
-      branch: "Bangalore",
-      department: "Engineering",
-      designation: "DevOps Engineer",
-      projectSite: "Whitefield",
-    },
-  ];
+  // const employees = [
+  //   {
+  //     id: 1,
+  //     name: "Aditi Sharma",
+  //     gender: "Female",
+  //     branch: "Delhi",
+  //     department: "HR",
+  //     designation: "HR Executive",
+  //     projectSite: "Dwarka",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Rohan Verma",
+  //     gender: "Male",
+  //     branch: "Mumbai",
+  //     department: "Accounts",
+  //     designation: "Senior Accountant",
+  //     projectSite: "Andheri",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Kavita Das",
+  //     gender: "Female",
+  //     branch: "Bangalore",
+  //     department: "IT",
+  //     designation: "Software Developer",
+  //     projectSite: "Electronic City",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Vikas Mehta",
+  //     gender: "Male",
+  //     branch: "Delhi",
+  //     department: "Sales",
+  //     designation: "Sales Manager",
+  //     projectSite: "Noida",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Pooja Nair",
+  //     gender: "Female",
+  //     branch: "Mumbai",
+  //     department: "HR",
+  //     designation: "Recruiter",
+  //     projectSite: "Andheri",
+  //   },
+  //   {
+  //     id: 6,
+  //     name: "Arjun Patel",
+  //     gender: "Male",
+  //     branch: "Bangalore",
+  //     department: "Engineering",
+  //     designation: "Frontend Developer",
+  //     projectSite: "Whitefield",
+  //   },
+  //   {
+  //     id: 7,
+  //     name: "Sneha Iyer",
+  //     gender: "Female",
+  //     branch: "Delhi",
+  //     department: "Marketing",
+  //     designation: "Content Strategist",
+  //     projectSite: "Dwarka",
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "Ritesh Gupta",
+  //     gender: "Male",
+  //     branch: "Mumbai",
+  //     department: "Engineering",
+  //     designation: "Backend Developer",
+  //     projectSite: "Andheri",
+  //   },
+  //   {
+  //     id: 9,
+  //     name: "Priya Menon",
+  //     gender: "Female",
+  //     branch: "Bangalore",
+  //     department: "Accounts",
+  //     designation: "Finance Associate",
+  //     projectSite: "Electronic City",
+  //   },
+  //   {
+  //     id: 10,
+  //     name: "Karan Singh",
+  //     gender: "Male",
+  //     branch: "Delhi",
+  //     department: "IT",
+  //     designation: "System Administrator",
+  //     projectSite: "Noida",
+  //   },
+  //   {
+  //     id: 11,
+  //     name: "Neha Kapoor",
+  //     gender: "Female",
+  //     branch: "Mumbai",
+  //     department: "Sales",
+  //     designation: "Business Development Executive",
+  //     projectSite: "Andheri",
+  //   },
+  //   {
+  //     id: 12,
+  //     name: "Ravi Deshmukh",
+  //     gender: "Male",
+  //     branch: "Bangalore",
+  //     department: "Engineering",
+  //     designation: "DevOps Engineer",
+  //     projectSite: "Whitefield",
+  //   },
+  // ];
 
+
+  console.log(employees, "employees")
 
   const filteredEmployees = employees.filter((emp) => {
     return (
@@ -137,6 +147,15 @@ const EmployeeList = () => {
       (filters.gender === "" || filters.gender === "All" || emp.gender === filters.gender)
     );
   });
+
+  
+  if (isLoading) {
+    return (
+      <div className="bg-white p-6 rounded-xl text-center">
+        Loading employees...
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white shadow-sm border border-gray-100 rounded-2xl p-6 mt-8 transition-all">

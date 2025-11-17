@@ -64,7 +64,7 @@ const EmployeeCard = ({ emp, onSelect, style }) => {
           {emp.name}
           {emp.designation && (
             <span className="text-sm font-normal text-gray-500">
-              • {emp.designation}
+              • {emp.designation.designation_name}
             </span>
           )}
         </h4>
@@ -74,11 +74,11 @@ const EmployeeCard = ({ emp, onSelect, style }) => {
       <div className="flex flex-wrap justify-center gap-2 mt-4">
         <div className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-100 px-2 py-1 rounded-full text-gray-600">
           <Building2 size={12} />
-          {emp.branch}
+          {emp.branch.branch_name}
         </div>
         <div className="flex items-center gap-1.5 text-xs bg-gray-50 border border-gray-100 px-2 py-1 rounded-full text-gray-600">
           <MapPin size={12} />
-          {emp.projectSite}
+          {emp.projectSite.site_name}
         </div>
       </div>
 
@@ -164,7 +164,7 @@ const EmployeeCardView = ({ employees }) => {
                 />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">{selectedEmployee.name}</h3>
-                  <p className="text-sm text-gray-500">{selectedEmployee.designation}</p>
+                  <p className="text-sm text-gray-500">{selectedEmployee.designation.designation_name}</p>
                 </div>
               </div>
 

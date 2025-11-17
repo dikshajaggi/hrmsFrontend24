@@ -2,9 +2,11 @@ import EmployeeList from "@/components/EmployeeList";
 import ImportDataModal from "@/components/common/ImportDataModal";
 import { Plus, Upload } from "lucide-react";
 import React, { useState } from "react";
+import { useQueryClient } from "react-query";
 
 const EmployeeManagement = () => {
   const [showModal, setShowModal] = useState(false);
+  const queryClient = useQueryClient();
   
   return (
     <div className="px-6 xl:px-8 2xl:px-10 py-6 w-full">
@@ -30,7 +32,10 @@ const EmployeeManagement = () => {
 
       {/* Upload Modal */}
       {showModal && (
-        <ImportDataModal setShowModal={setShowModal} />
+        <ImportDataModal setShowModal={setShowModal} 
+          importType="emp-data"
+          onSuccess={() => queryClient.invalidateQueries(["employees"])}
+        />
       )}
     </div>
   );

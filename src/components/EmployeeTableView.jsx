@@ -56,6 +56,7 @@ const EmployeeTableView = ({ employees }) => {
             Department
           </div>
         ),
+        cell: ({ row }) => row.original.department?.department_name || "—",
         size: 160,
       },
       {
@@ -66,6 +67,7 @@ const EmployeeTableView = ({ employees }) => {
             Branch
           </div>
         ),
+        cell: ({ row }) => row.original.branch?.branch_name || "—",
         size: 140,
       },
       {
@@ -76,6 +78,7 @@ const EmployeeTableView = ({ employees }) => {
             Project Site
           </div>
         ),
+        cell: ({ row }) => row.original.projectSite?.site_name || "—",
         size: 180,
       },
       {

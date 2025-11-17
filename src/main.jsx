@@ -3,16 +3,18 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { MsalProvider } from '@azure/msal-react'
-import { PublicClientApplication } from '@azure/msal-browser'
-import { msalConfig } from './config/authConfig'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { msalInstance } from './apis/msalInstance'
 
-const msalInstance = new PublicClientApplication(msalConfig);
+const queryClient = new QueryClient();
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-     <MsalProvider instance={msalInstance}>
+    <QueryClientProvider client={queryClient}>
+      <MsalProvider instance={msalInstance}>
        <App />
      </MsalProvider>
+    </QueryClientProvider>
   </StrictMode>,
 )
