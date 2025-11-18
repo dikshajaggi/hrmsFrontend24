@@ -167,13 +167,22 @@ const EmployeeList = () => {
   const filteredEmployees = useMemo(() => {
     return employees.filter((emp) => {
       return (
-        (filters.branch === "" || filters.branch === "All" || emp.branch?.branch_name.toLowerCase() === filters.branchtoLowerCase()) &&
+        (filters.branch === "" || filters.branch === "All" || emp.branch?.branch_name.toLowerCase() === filters.branch.toLowerCase()) &&
         (filters.department === "" || filters.department === "All" || emp.department?.department_name.toLowerCase() === filters.department.toLowerCase()) &&
         (filters.projectSite === "" || filters.projectSite === "All" || emp.projectSite?.site_name.toLowerCase() === filters.projectSite.toLowerCase()) &&
         (filters.gender === "" || filters.gender === "All" || emp.gender.toLowerCase() === filters.gender.toLowerCase())
       );
     });
   }, [employees, filters]);
+
+  const resetFilters = () => {
+    setFilters({
+      branch: "",
+      department: "",
+      projectSite: "",
+      gender: "",
+    })
+  }
 
   if (isLoading) {
     return (
@@ -261,15 +270,16 @@ const EmployeeList = () => {
               onChange={(val) => setFilters({ ...filters, gender: val })}
             />
           </div>
+          <div className="" onClick={resetFilters}>Reset</div>
         </div>
       </div>
 
       {/* Employee List Section */}
       {filteredEmployees.length > 0 ? (
         view === "table" ? (
-          <EmployeeTableView employees={filteredEmployees} />
+          <EmployeeTableView employees={filteredEmployees} filters={filters} setFilters={setFilters} />
         ) : (
-          <EmployeeCardView employees={filteredEmployees} />
+          <EmployeeCardView employees={filteredEmployees} filters={filters} setFilters={setFilters} />
         )
       ) : (
         <div className="text-center py-10 text-gray-500 border border-dashed border-gray-200 rounded-xl">

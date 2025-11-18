@@ -9,7 +9,7 @@ import ExportDataModal from "./common/ExportDataModal";
 import { Search, User, Building2, MapPin, Briefcase, Users } from "lucide-react";
 import SearchExportData from "./SearchExportData";
 
-const EmployeeTableView = ({ employees }) => {
+const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
 
@@ -106,7 +106,14 @@ const EmployeeTableView = ({ employees }) => {
       <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} />
 
       {showExport && (
-        <ExportDataModal isOpen={showExport} onClose={() => setShowExport(false)} />
+         <ExportDataModal 
+            isOpen={showExport}
+            onClose={() => setShowExport(false)}
+            modal="employee"
+            data={employees} 
+            filters={filters} 
+            setFilters={setFilters}                  
+        />
       )}
 
       {/* Table */}

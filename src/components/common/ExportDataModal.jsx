@@ -1,20 +1,35 @@
+import { useExport } from "@/hooks/useExport";
 import { X } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import React, {useMemo } from "react";
 
-const ExportDataModal = ({ isOpen, onClose }) => {
-  const [filters, setFilters] = useState({
-    branch: "",
-    department: "",
-    projectSite: "",
-    format: "CSV",
-    dateRangeType: "today",
-    startDate: "",
-    endDate: "",
-  });
+const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) => {
 
-  const branches = ["Delhi", "Mumbai", "Bangalore"];
-  const departments = ["Accounts", "HR", "Engineering", "Sales"];
-  const sites = ["Dwarka", "Noida", "Andheri", "Electronic City"];
+  const { exportData } = useExport(data);
+
+
+  const branches = useMemo(() => {
+    const items = data
+      .map(emp => emp.branch?.branch_name)
+      .filter(Boolean); 
+    
+    return ["All", ...new Set(items)];
+  }, [data]);
+
+  const departments = useMemo(() => {
+    const items = data
+      .map(emp => emp.department?.department_name)
+      .filter(Boolean); 
+    
+    return ["All", ...new Set(items)];
+  }, [data]);
+
+  const sites = useMemo(() => {
+    const items = data
+      .map(emp => emp.projectSite?.site_name)
+      .filter(Boolean);
+
+    return ["All", ...new Set(items)];
+  }, [data]);
 
   const formatDate = (date) =>
     date.toLocaleDateString("en-US", {
@@ -25,6 +40,7 @@ const ExportDataModal = ({ isOpen, onClose }) => {
 
   // dynamic date ranges
   const today = new Date();
+
   const last7days = useMemo(() => {
     const end = new Date();
     const start = new Date();
@@ -40,6 +56,7 @@ const ExportDataModal = ({ isOpen, onClose }) => {
 
   const handleExport = () => {
     console.log("Exporting with filters:", filters);
+    exportData(filters.format)
     onClose();
   };
 
@@ -59,7 +76,12 @@ const ExportDataModal = ({ isOpen, onClose }) => {
         {/* header */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-800">
-           Export Employee Data
+           Export Employee Data <span onClick={() =>  setFilters({
+              branch: "",
+              department: "",
+              projectSite: "",
+              gender: "",
+            })}>Reset</span>
           </h2>
           <p className="text-gray-500 text-sm mt-1">
             Choose filters and export format to generate your report.
@@ -155,7 +177,7 @@ const ExportDataModal = ({ isOpen, onClose }) => {
         <div className="border-t border-gray-100 my-4"></div>
 
         {/* time period */}
-        <div>
+        {modal !== "employee" && <div>
           <h3 className="text-sm font-medium text-gray-700 mb-3">
             Time Period
           </h3>
@@ -217,7 +239,7 @@ const ExportDataModal = ({ isOpen, onClose }) => {
               </div>
             </div>
           )}
-        </div>
+        </div>}
 
         {/* footer */}
         <div className="mt-8 flex justify-end gap-3">

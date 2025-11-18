@@ -10,8 +10,7 @@ import {
 import * as ReactWindow from "react-window";
 import SearchExportData from "./SearchExportData";
 import ExportDataModal from "./common/ExportDataModal";
-import { useNavigate } from "react-router-dom";
-console.log("ReactWindow exports:", ReactWindow);
+// import { useNavigate } from "react-router-dom";
 
 
 const Grid = ReactWindow.FixedSizeGrid;
@@ -97,11 +96,11 @@ const EmployeeCard = ({ emp, onSelect, style }) => {
 };
 
 
-const EmployeeCardView = ({ employees }) => {
+const EmployeeCardView = ({ employees, filters, setFilters }) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const columnCount = useMemo(() => {
     if (window.innerWidth >= 1024) return 3;
@@ -130,7 +129,14 @@ const EmployeeCardView = ({ employees }) => {
       <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} />
       
       {showExport && (
-        <ExportDataModal isOpen={showExport} onClose={() => setShowExport(false)} />
+        <ExportDataModal 
+            isOpen={showExport}
+            onClose={() => setShowExport(false)}
+            modal="employee"
+            data={employees}                
+            filters={filters}    
+            setFilters={setFilters}          
+        />
       )}
 
       {/* Virtualized Grid */}

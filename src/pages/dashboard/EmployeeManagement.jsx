@@ -15,7 +15,7 @@ const EmployeeManagement = () => {
 
        <div className="flex flex-wrap gap-2">
         <button
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-pointer"
+          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-not-allowed"
         >
           <Plus size={16} /> Add Employee
         </button>
