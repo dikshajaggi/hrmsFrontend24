@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,116 +13,13 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
-import * as XLSX from "xlsx";
-import { ChevronDown, Import } from "lucide-react";
+import { Import } from "lucide-react";
 import ExportDataModal from "./common/ExportDataModal";
+import { AttendanceCell, DesktopTable, MobileCards } from "./AttendanceTableUtils";
+import { useQuery } from "react-query";
+import { getEmployees } from "@/apis";
 
 
-const employeesData = [
-  { id: 1, name: "Aditi Sharma", gender: "Female", branch: "Delhi", department: "HR", designation: "HR Executive", projectSite: "Dwarka" },
-  { id: 2, name: "Rohan Verma", gender: "Male", branch: "Mumbai", department: "Accounts", designation: "Senior Accountant", projectSite: "Andheri" },
-  { id: 3, name: "Kavita Das", gender: "Female", branch: "Bangalore", department: "IT", designation: "Software Developer", projectSite: "Electronic City" },
-  { id: 4, name: "Vikas Mehta", gender: "Male", branch: "Delhi", department: "Sales", designation: "Sales Manager", projectSite: "Noida" },
-  { id: 5, name: "Pooja Nair", gender: "Female", branch: "Mumbai", department: "HR", designation: "Recruiter", projectSite: "Andheri" },
-  { id: 6, name: "Arjun Patel", gender: "Male", branch: "Bangalore", department: "Engineering", designation: "Frontend Developer", projectSite: "Whitefield" },
-  { id: 7, name: "Sneha Iyer", gender: "Female", branch: "Delhi", department: "Marketing", designation: "Content Strategist", projectSite: "Dwarka" },
-  { id: 8, name: "Ritesh Gupta", gender: "Male", branch: "Mumbai", department: "Engineering", designation: "Backend Developer", projectSite: "Andheri" },
-  { id: 9, name: "Priya Menon", gender: "Female", branch: "Bangalore", department: "Accounts", designation: "Finance Associate", projectSite: "Electronic City" },
-  { id: 10, name: "Karan Singh", gender: "Male", branch: "Delhi", department: "IT", designation: "System Administrator", projectSite: "Noida" },
-  { id: 11, name: "Neha Kapoor", gender: "Female", branch: "Mumbai", department: "Sales", designation: "Business Development Executive", projectSite: "Andheri" },
-  { id: 12, name: "Ravi Deshmukh", gender: "Male", branch: "Bangalore", department: "Engineering", designation: "DevOps Engineer", projectSite: "Whitefield" },
-]
-// =======================
-//  Attendance Codes
-// =======================
-const ATTENDANCE_CODES = {
-  P: { label: "Present", color: "bg-green-100 text-green-700" },
-  H: { label: "Holiday", color: "bg-purple-100 text-purple-700" },
-  S: { label: "Saturday Off", color: "bg-red-200 text-red-800" },
-  L: { label: "Casual Leave", color: "bg-red-100 text-red-700" },
-  L1: {
-    label: "Casual Leave (first half off)",
-    color: "bg-red-100 text-red-700",
-  },
-  L2: {
-    label: "Casual Leave (second half off)",
-    color: "bg-red-100 text-red-700",
-  },
-  SL: { label: "Sick Leave", color: "bg-emerald-200 text-emerald-800" },
-  SL1: {
-    label: "Sick Leave (first half off)",
-    color: "bg-emerald-200 text-emerald-800",
-  },
-  SL2: {
-    label: "Sick Leave (second half off)",
-    color: "bg-emerald-200 text-emerald-800",
-  },
-  W: { label: "Work From Home", color: "bg-blue-100 text-blue-700" },
-  C: { label: "Comp Off", color: "bg-yellow-100 text-yellow-700" },
-};
-
-const OPTIONS = Object.keys(ATTENDANCE_CODES);
-
-
-// =======================
-//  DROPDOWN CELL
-// =======================
-function AttendanceCell({ value, disabled, onChange }) {
-  const [open, setOpen] = useState(false);
-  const color = ATTENDANCE_CODES[value]?.color || "bg-gray-50 text-gray-400";
-
-  return (
-    <div className="relative min-w-[40px]">
-      <button
-        onClick={() => !disabled && setOpen((s) => !s)}
-        className={`w-full px-1.5 md:px-2 py-1 rounded-md text-[10px] md:text-xs flex items-center justify-center ${color}`}
-        disabled={disabled}
-      >
-        {value || "-"}
-        {!disabled && <ChevronDown size={12} className="ml-1" />}
-      </button>
-
-      {open && (
-        <div
-          className="absolute z-50 mt-1 w-64 bg-white border rounded-lg shadow"
-          onMouseLeave={() => setOpen(false)}
-        >
-          <div
-            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
-            onClick={() => {
-              onChange("");
-              setOpen(false);
-            }}
-          >
-            Clear
-          </div>
-
-          {OPTIONS.map((opt) => (
-            <div
-              key={opt}
-              className="px-3 py-2 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
-            >
-              <span
-                className={`w-6 h-6 rounded flex items-center justify-center text-xs font-semibold ${ATTENDANCE_CODES[opt].color}`}
-              >
-                {opt}
-              </span>
-              {ATTENDANCE_CODES[opt].label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// =======================
-//  MAIN TABLE
-// =======================
 export default function AttendanceTable({
   filters,
   setFilters,
@@ -133,14 +30,17 @@ export default function AttendanceTable({
     { date: "2025-11-22", week: 4 },
   ],
 }) {
-  const [employees, setEmployees] = useState([]);
+  
+  const { data: employees = [] } = useQuery(
+    ["employees"],
+    getEmployees,
+    { refetchOnWindowFocus: false }
+  );
   const [attendance, setAttendance] = useState({});
   const [month, setMonth] = useState(initialMonth);
   const [showExport, setShowExport] = useState(false);
 
-  useEffect(() => {
-    setEmployees(employeesData);
-  }, []);
+
 
   const days = useMemo(
     () =>
@@ -192,14 +92,14 @@ export default function AttendanceTable({
     setAttendance((prev) => {
       const next = { ...prev };
       employees.forEach((emp) => {
-        next[emp.id] = { ...(next[emp.id] || {}) };
+        next[emp.employee_id] = { ...(next[emp.employee_id] || {}) };
         days.forEach((d) => {
           const dateStr = format(d, "yyyy-MM-dd");
           const isSunday = sundays.includes(dateStr);
           const isHoliday = holidays.includes(dateStr) || isSunday;
           const isSaturday = saturdays.includes(dateStr);
           const disabled = isHoliday || isSaturday;
-          if (!disabled) next[emp.id][dateStr] = status;
+          if (!disabled) next[emp.employee_id][dateStr] = status;
         });
       });
       return next;
@@ -229,12 +129,12 @@ export default function AttendanceTable({
         const isHoliday = holidays.includes(dateStr) || isSunday;
         const isSaturday = saturdays.includes(dateStr);
         const auto = isHoliday ? "H" : isSaturday ? "S" : null;
-        const value = auto || attendance?.[emp.id]?.[dateStr] || "";
+        const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
         if (value && counts[value] !== undefined) counts[value] += 1;
       });
       counts.totalL = counts.L + counts.L1 * 0.5 + counts.L2 * 0.5;
       counts.totalSL = counts.SL + counts.SL1 * 0.5 + counts.SL2 * 0.5;
-      map[emp.id] = counts;
+      map[emp.employee_id] = counts;
     });
     return map;
   }, [employees, attendance, days, holidays, saturdays, sundays]);
@@ -259,7 +159,7 @@ export default function AttendanceTable({
         header: "Dept",
         cell: ({ row }) => (
           <div className="w-[90px] md:w-[120px] font-medium sticky left-[120px] md:left-[160px] bg-white px-2 z-30 whitespace-nowrap">
-            {row.original.department}
+            {row.original.department.department_name}
           </div>
         ),
       }),
@@ -289,7 +189,7 @@ export default function AttendanceTable({
           const isHolidayLocal = holidays.includes(dateStr) || isSundayLocal;
           const isSaturdayLocal = saturdays.includes(dateStr);
           const auto = isHolidayLocal ? "H" : isSaturdayLocal ? "S" : null;
-          const value = auto || attendance?.[emp.id]?.[dateStr] || "";
+          const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
 
           return (
             <div
@@ -300,7 +200,7 @@ export default function AttendanceTable({
               <AttendanceCell
                 value={value}
                 disabled={isHolidayLocal || isSaturdayLocal}
-                onChange={(v) => handleChange(emp.id, dateStr, v)}
+                onChange={(v) => handleChange(emp.employee_id, dateStr, v)}
               />
             </div>
           );
@@ -314,7 +214,7 @@ export default function AttendanceTable({
         header: "Total P",
         cell: ({ row }) => (
           <div className="px-2 whitespace-nowrap">
-            {(totals[row.original.id] || {}).P || 0}
+            {(totals[row.original.employee_id] || {}).P || 0}
           </div>
         ),
       }),
@@ -322,7 +222,7 @@ export default function AttendanceTable({
         id: "totalL",
         header: "Total L",
         cell: ({ row }) => {
-          const t = totals[row.original.id] || {};
+          const t = totals[row.original.employee_id] || {};
           return <div className="px-2 whitespace-nowrap">{t.totalL || 0}</div>;
         },
       }),
@@ -330,7 +230,7 @@ export default function AttendanceTable({
         id: "totalSL",
         header: "Total SL",
         cell: ({ row }) => {
-          const t = totals[row.original.id] || {};
+          const t = totals[row.original.employee_id] || {};
           return <div className="px-2 whitespace-nowrap">{t.totalSL || 0}</div>;
         },
       }),
@@ -345,132 +245,44 @@ export default function AttendanceTable({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  // =======================
-//  MOBILE CARD VIEW (ONLY < 640px)
 // =======================
+//  EXPORT DATA OBJECT GENERATOR
 // =======================
-//  ENHANCED MOBILE CARD VIEW (ONLY < 640px)
-// =======================
-const MobileCards = () => {
-  const [expanded, setExpanded] = useState({}); // track which employee is expanded
-  const [showFull, setShowFull] = useState({}); // track expanded days list
+const getExportAttendanceData = () => {
+  const exportObj = {
+    month: format(month, "yyyy-MM"),
+    days: days.map((d) => format(d, "yyyy-MM-dd")),
+    employees: [],
+  };
 
-  const toggleExpand = (empId) =>
-    setExpanded((prev) => ({ ...prev, [empId]: !prev[empId] }));
+  employees.forEach((emp) => {
+    const empAttendance = {};
+    const empTotals = totals[emp.employee_id] || {};
 
-  const toggleShowFull = (empId) =>
-    setShowFull((prev) => ({ ...prev, [empId]: !prev[empId] }));
+    days.forEach((day) => {
+      const dateStr = format(day, "yyyy-MM-dd");
 
-  return (
-    <div className="block sm:hidden space-y-4">
-      {employees.map((emp) => {
-        const empTotals = totals[emp.id] || {};
+      const isSunday = sundays.includes(dateStr);
+      const isHoliday = holidays.includes(dateStr) || isSunday;
+      const isSaturday = saturdays.includes(dateStr);
 
-        const displayedDays = showFull[emp.id] ? days : days.slice(0, 10); // first 10 days preview
+      const auto = isHoliday ? "H" : isSaturday ? "S" : null;
+      const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
 
-        return (
-          <div
-            key={emp.id}
-            className="border rounded-xl bg-white shadow p-4 relative"
-          >
-            {/* Card Header */}
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="text-lg font-semibold">{emp.name}</div>
-                <div className="text-gray-500 text-sm">{emp.department}</div>
-              </div>
+      empAttendance[dateStr] = value;
+    });
 
-              <button
-                className="text-blue-600 text-sm"
-                onClick={() => toggleExpand(emp.id)}
-              >
-                {expanded[emp.id] ? "Hide" : "View"}
-              </button>
-            </div>
+    exportObj.employees.push({
+      id: emp.employee_id,
+      name: emp.name,
+      department: emp.department.department_name || null,
+      attendance: empAttendance,
+      totals: empTotals,
+    });
+  });
 
-            {/* Totals */}
-            {expanded[emp.id] && (
-              <div className="flex justify-between mt-3 border-b pb-2">
-                <div className="text-sm">
-                  <span className="font-semibold">P:</span>{" "}
-                  {empTotals.P || 0}
-                </div>
-                <div className="text-sm">
-                  <span className="font-semibold">L:</span>{" "}
-                  {empTotals.totalL || 0}
-                </div>
-                <div className="text-sm">
-                  <span className="font-semibold">SL:</span>{" "}
-                  {empTotals.totalSL || 0}
-                </div>
-              </div>
-            )}
-
-            {/* Days */}
-            {expanded[emp.id] && (
-              <>
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  {displayedDays.map((day) => {
-                    const dateStr = format(day, "yyyy-MM-dd");
-                    const weekday = format(day, "EEE");
-
-                    const isSundayLocal = sundays.includes(dateStr);
-                    const isHolidayLocal =
-                      holidays.includes(dateStr) || isSundayLocal;
-                    const isSaturdayLocal = saturdays.includes(dateStr);
-
-                    const auto = isHolidayLocal
-                      ? "H"
-                      : isSaturdayLocal
-                      ? "S"
-                      : null;
-
-                    const value =
-                      auto || attendance?.[emp.id]?.[dateStr] || "";
-
-                    return (
-                      <div
-                        key={dateStr}
-                        className={`p-3 rounded-lg border ${
-                          isSundayLocal
-                            ? "bg-yellow-50"
-                            : isSaturdayLocal
-                            ? "bg-gray-100"
-                            : "bg-gray-50"
-                        }`}
-                      >
-                        <div className="text-[11px] font-semibold text-gray-700 mb-1">
-                          {format(day, "d")} • {weekday}
-                        </div>
-
-                        <AttendanceCell
-                          value={value}
-                          disabled={isHolidayLocal || isSaturdayLocal}
-                          onChange={(v) => handleChange(emp.id, dateStr, v)}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Show more/less button */}
-                {days.length > 10 && (
-                  <button
-                    className="mt-3 w-full text-blue-600 text-center text-sm"
-                    onClick={() => toggleShowFull(emp.id)}
-                  >
-                    {showFull[emp.id] ? "Show Less Days" : "Show All Days"}
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+  return exportObj;
 };
-
 
   return (
     <div className="w-full p-2 md:p-4 bg-white border rounded-xl max-w-full overflow-x-auto">
@@ -518,61 +330,11 @@ const MobileCards = () => {
         </div>
       </div>
 
-    <MobileCards />
+    {/* MBOILE CARDS VIEW */}
+    <MobileCards employees={employees} totals={totals} saturdays={saturdays} sundays={sundays} days={days} holidays={holidays} attendance={attendance} handleChange={handleChange} />
 
     {/* DESKTOP TABLE VIEW */}
-      {/* Responsive Scroll Wrapper */}
-      <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[70vh] w-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-        <table className="w-full text-[10px] md:text-xs border-collapse">
-          <thead className="bg-gray-100 sticky top-0 z-30">
-            {table.getHeaderGroups().map((group) => (
-              <tr key={group.id}>
-                {group.headers.map((header, idx) => (
-                  <th
-                    key={header.id}
-                    className={` px-3 py-2 text-center border font-semibold whitespace-nowrap ${
-                      idx === 0
-                        ? "sticky left-0 z-999 bg-white"
-                        : idx === 1
-                        ? "sticky left-[120px] md:left-[160px] border z-40 bg-white"
-                        : ""
-                    }`}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell, idx) => (
-                  <td
-                    key={cell.id}
-                    className={`px-2 py-1 border text-center whitespace-nowrap ${
-                      idx === 0
-                        ? "sticky left-0 bg-white border"
-                        : idx === 1
-                        ? "sticky left-[120px] md:left-[160px] bg-white border"
-                        : ""
-                    }`}
-                  >
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <DesktopTable table={table} flexRender={flexRender} />
 
       {showExport && (
         <ExportDataModal
@@ -582,6 +344,7 @@ const MobileCards = () => {
           data={employees}
           filters={filters}
           setFilters={setFilters}
+          // attendanceData = {getExportAttendanceData()}
         />
       )}
 
