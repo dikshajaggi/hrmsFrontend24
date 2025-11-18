@@ -8,6 +8,11 @@ export const importData = (importType, formData) => {
   });
 };
 
+//----------------------branch apis-----------------------
+export const getBranches = async () => {
+ const res = await api.get("/branch");
+  return res.data.data;
+}
 
 //----------------------employee apis-----------------------
 export const getEmployees = async () => {

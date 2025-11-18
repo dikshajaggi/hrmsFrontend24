@@ -42,7 +42,7 @@ const DashboardCards = () => {
         {/* Branch Selector */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-4">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-gray-200 capitalize">
-            {selectedBranch === "all" ? `Today’s Attendance – ${selectedBranch} Branches` : `Today’s Attendance – ${selectedBranch} Branch`}
+            {selectedBranch === "all" ? `Today’s Attendance – All Branches` : `Today’s Attendance – ${selectedBranch}`}
           </h2>
           <BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch}/>
         </div>

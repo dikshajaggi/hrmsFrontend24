@@ -9,16 +9,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select.jsx"
-
-const branches = [
-  { value: "delhi", label: 'Delhi' },
-  { value: "pune", label: 'Pune' },
-  { value: "kochi", label: 'Kochi' },
-  { value: "mumbai", label: 'Mumbai' },
-  { value: "all", label: 'All' }
-];
+import { useQuery } from 'react-query';
+import { getBranches } from '@/apis/index.js';
 
 const BranchSelect = ({selectedBranch, setSelectedBranch}) => {    
+    const { data: branches = [], isLoading } = useQuery(
+    ["branches"],
+    getBranches,
+    { refetchOnWindowFocus: false }
+    );
+
+    console.log(branches, "branches")
+
     return (
         <div className='flex items-center justify-evenly gap-2'>
         <label className="font-semibold">Select Branch:</label>
@@ -29,13 +31,13 @@ const BranchSelect = ({selectedBranch, setSelectedBranch}) => {
                 <SelectValue placeholder="Select Branch" />
             </SelectTrigger>
             <SelectContent>
-                <SelectGroup>
+                {isLoading ? <SelectGroup></SelectGroup> : <SelectGroup>
                 {branches.map((item , index) => { 
                     return (
-                    <SelectItem value={item.value} key={index}>{item.label}</SelectItem>
+                    <SelectItem value={item.branch_name} key={index}>{item.branch_name}</SelectItem>
                     )}
                 )}
-                </SelectGroup>
+                </SelectGroup>}
             </SelectContent>
             </Select>
         </div>

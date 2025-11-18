@@ -248,41 +248,114 @@ export default function AttendanceTable({
 // =======================
 //  EXPORT DATA OBJECT GENERATOR
 // =======================
-const getExportAttendanceData = () => {
-  const exportObj = {
-    month: format(month, "yyyy-MM"),
-    days: days.map((d) => format(d, "yyyy-MM-dd")),
-    employees: [],
+  const getExportAttendanceData = () => {
+    // -------------------------------------------
+    // 1. READ DATE RANGE TYPE FROM FILTERS
+    // -------------------------------------------
+    const type = filters.dateRangeType;
+    let start, end;
+
+    const today = new Date();
+
+    switch (type) {
+      case "today":
+        start = new Date();
+        end = new Date();
+        break;
+
+      case "thisMonth":
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        break;
+
+      case "lastmonth":
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+
+      case "custom":
+        start = new Date(filters.startDate);
+        end = new Date(filters.endDate);
+        break;
+
+      default:
+        // fallback: current month
+        start = startOfMonth(month);
+        end = endOfMonth(month);
+        break;
+    }
+
+    // -------------------------------------------
+    // 2. GENERATE DAY LIST FOR EXPORT RANGE
+    // -------------------------------------------
+    const exportDays = eachDayOfInterval({ start, end });
+
+    const exportObj = {
+      dateRangeType: type,
+      startDate: format(start, "yyyy-MM-dd"),
+      endDate: format(end, "yyyy-MM-dd"),
+      days: exportDays.map((d) => format(d, "yyyy-MM-dd")),
+      employees: [],
+    };
+
+    // -------------------------------------------
+    // 3. BUILD DATA FOR EACH EMPLOYEE
+    // -------------------------------------------
+    employees.forEach((emp) => {
+      const empAttendance = {};
+
+      // Recalculate totals for export range only
+      const counts = {
+        P: 0,
+        H: 0,
+        S: 0,
+        L: 0,
+        L1: 0,
+        L2: 0,
+        SL: 0,
+        SL1: 0,
+        SL2: 0,
+        W: 0,
+        C: 0,
+      };
+
+      exportDays.forEach((day) => {
+        const dateStr = format(day, "yyyy-MM-dd");
+
+        const isSunday = sundays.includes(dateStr);
+        const isHoliday = holidays.includes(dateStr) || isSunday;
+        const isSaturday = saturdays.includes(dateStr);
+
+        const auto = isHoliday ? "H" : isSaturday ? "S" : null;
+
+        const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
+
+        // Save value
+        empAttendance[dateStr] = value;
+
+        // Count totals
+        if (value && counts[value] !== undefined) counts[value] += 1;
+      });
+
+      // compute L and SL totals
+      counts.totalL = counts.L + counts.L1 * 0.5 + counts.L2 * 0.5;
+      counts.totalSL = counts.SL + counts.SL1 * 0.5 + counts.SL2 * 0.5;
+
+      // final employee object
+      exportObj.employees.push({
+        id: emp.employee_id,
+        name: emp.name,
+        department: emp.department?.department_name || "",
+        branch: emp.branch?.branch_name || "",
+        projectSite: emp.projectSite?.site_name || "",
+        attendance: empAttendance,
+        totals: counts,
+      });
+    });
+
+    return exportObj;
   };
 
-  employees.forEach((emp) => {
-    const empAttendance = {};
-    const empTotals = totals[emp.employee_id] || {};
-
-    days.forEach((day) => {
-      const dateStr = format(day, "yyyy-MM-dd");
-
-      const isSunday = sundays.includes(dateStr);
-      const isHoliday = holidays.includes(dateStr) || isSunday;
-      const isSaturday = saturdays.includes(dateStr);
-
-      const auto = isHoliday ? "H" : isSaturday ? "S" : null;
-      const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
-
-      empAttendance[dateStr] = value;
-    });
-
-    exportObj.employees.push({
-      id: emp.employee_id,
-      name: emp.name,
-      department: emp.department.department_name || null,
-      attendance: empAttendance,
-      totals: empTotals,
-    });
-  });
-
-  return exportObj;
-};
 
   return (
     <div className="w-full p-2 md:p-4 bg-white border rounded-xl max-w-full overflow-x-auto">
@@ -344,7 +417,7 @@ const getExportAttendanceData = () => {
           data={employees}
           filters={filters}
           setFilters={setFilters}
-          // attendanceData = {getExportAttendanceData()}
+          attendanceData = {getExportAttendanceData()}
         />
       )}
 

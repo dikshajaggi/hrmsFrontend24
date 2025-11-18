@@ -2,9 +2,9 @@ import { useExport } from "@/hooks/useExport";
 import { X } from "lucide-react";
 import React, {useMemo } from "react";
 
-const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) => {
-
-  const { exportData } = useExport(data);
+const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, attendanceData}) => {
+  const dataToBeExported = modal === "attendance" ? attendanceData : data
+  const { exportData } = useExport(dataToBeExported);
 
   const branches = useMemo(() => {
     const items = data
@@ -40,10 +40,9 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) =
   // dynamic date ranges
   const today = new Date();
 
-  const last7days = useMemo(() => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(end.getDate() - 6);
+  const thisMonth = useMemo(() => {
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
     return `${formatDate(start)} – ${formatDate(end)}`;
   }, []);
 
@@ -183,7 +182,7 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) =
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { id: "today", label: "Today", sub: formatDate(today) },
-              { id: "last7days", label: "Last 7 Days", sub: last7days },
+              { id: "thisMonth", label: "This Month", sub: thisMonth },
               { id: "lastmonth", label: "Last Month", sub: lastMonth },
               { id: "custom", label: "Custom Range", sub: "Choose any date/range" },
             ].map((opt) => (
@@ -192,7 +191,7 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) =
                 onClick={() =>
                   setFilters({ ...filters, dateRangeType: opt.id })
                 }
-                className={`border rounded-lg text-sm px-3 py-2 text-left transition flex flex-col items-start ${
+                className={`border rounded-lg text-sm px-3 py-2 text-left transition flex flex-col items-start cursor-pointer ${
                   filters.dateRangeType === opt.id
                     ? "border-blue-600 bg-blue-50 text-blue-700"
                     : "border-gray-200 hover:bg-gray-50 text-gray-700"
