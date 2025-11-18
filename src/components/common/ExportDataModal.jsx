@@ -6,7 +6,6 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) =
 
   const { exportData } = useExport(data);
 
-
   const branches = useMemo(() => {
     const items = data
       .map(emp => emp.branch?.branch_name)
@@ -76,7 +75,7 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters}) =
         {/* header */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-800">
-           Export Employee Data <span onClick={() =>  setFilters({
+           Export Data <span onClick={() =>  setFilters({
               branch: "",
               department: "",
               projectSite: "",

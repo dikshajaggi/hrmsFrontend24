@@ -6,7 +6,16 @@ import React, { useState } from 'react'
 
 const AttendanceManagement = () => {
   const [selectedBranch, setSelectedBranch] = useState("all");
-  
+  const [filters, setFilters] = useState({
+      branch: "",
+      department: "",
+      projectSite: "",
+      gender: "",
+      format: "CSV",
+      dateRangeType: "today",
+      startDate: "",
+      endDate: "",
+  });
   return (
     <div className="px-6 xl:px-8 2xl:px-10 py-6 w-full">
       <DashboardCards />
@@ -17,7 +26,7 @@ const AttendanceManagement = () => {
           <BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch}/>
         </div>
       <div className="grid grid-cols-1 overflow-auto mt-2">
-        <AttendanceTable />
+        <AttendanceTable filters={filters} setFilters={setFilters} />
       </div>
     </div>
   )

@@ -19,7 +19,7 @@ const SearchExportData = ({globalFilter, setGlobalFilter, setShowExport}) => {
           onClick={() => setShowExport(true)}
           className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
         >
-           <Import size={16} /> Export Employee Data
+           <Import size={16} /> Export Data
         </button>
       </div>
   )

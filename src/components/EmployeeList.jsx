@@ -19,6 +19,7 @@ const EmployeeList = () => {
     department: "",
     projectSite: "",
     gender: "",
+    format: "CSV"
   });
 
     // using useMemo ->
