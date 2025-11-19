@@ -1,11 +1,13 @@
 import AttendanceTable from '@/components/AttendanceTable'
-import BranchSelect from '@/components/BranchSelect'
+import {BranchSelect, ProjectSiteSelect} from '@/components/BranchProjectSiteSelect'
 import CommonCalendar from '@/components/CommonCalendar'
 import DashboardCards from '@/components/DashboardCards'
 import React, { useState } from 'react'
 
 const AttendanceManagement = () => {
-  const [selectedBranch, setSelectedBranch] = useState("all");
+  const [selectedBranch, setSelectedBranch] = useState("Head Office");
+  const [selectedSite, setSelectedSite] = useState("Head Site 1")
+
   const [filters, setFilters] = useState({
       branch: "",
       department: "",
@@ -23,7 +25,10 @@ const AttendanceManagement = () => {
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-gray-200 capitalize">
             {selectedBranch === "all" ? `This month’s attendance – All Branches ` : `This month’s attendance – ${selectedBranch}`}
           </h2>
-          <BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch}/>
+          <div className="flex flex-wrap items-center gap-4">
+            <div><BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} /></div>
+            <div><ProjectSiteSelect selectedSite={selectedSite} setSelectedSite={setSelectedSite} /></div>
+          </div>
         </div>
       <div className="grid grid-cols-1 overflow-auto mt-2">
         <AttendanceTable filters={filters} setFilters={setFilters} />

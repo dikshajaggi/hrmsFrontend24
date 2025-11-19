@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
 
-const ModernSelect = ({ label, options, value, onChange }) => {
+const ExportModuleDropdowns = ({ label, options, value, onChange }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -18,9 +18,9 @@ const ModernSelect = ({ label, options, value, onChange }) => {
   }, []);
 
   return (
-    <div className="relative group min-w-[180px]" ref={ref}>
+    <div className="relative group w-full" ref={ref}>
       {/* Label */}
-      <label className="absolute -top-2 left-2 bg-white px-1 text-[11px] text-gray-500 group-focus-within:text-blue-600 transition-all">
+      <label className="block text-sm font-medium text-gray-700 mb-1 group-focus-within:text-blue-600 transition-all">
         {label}
       </label>
 
@@ -28,7 +28,7 @@ const ModernSelect = ({ label, options, value, onChange }) => {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="cursor-pointer z-50 w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:shadow-sm"
+        className="w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:shadow-sm"
       >
         <span>{value || options[0]}</span>
         <ChevronDown
@@ -46,9 +46,7 @@ const ModernSelect = ({ label, options, value, onChange }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-999 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg 
-                       overflow-y-auto max-h-52   /* FIXED HEIGHT + SCROLL */ 
-                       scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+            className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
           >
             {options.map((opt) => (
               <li
@@ -71,6 +69,6 @@ const ModernSelect = ({ label, options, value, onChange }) => {
       </AnimatePresence>
     </div>
   );
-};
+}
 
-export default ModernSelect;
+export default ExportModuleDropdowns

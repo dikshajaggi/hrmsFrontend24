@@ -372,13 +372,13 @@ export default function AttendanceTable({
         <div className="flex flex-wrap items-center gap-2 justify-end text-sm">
           <button
             onClick={() => setMonth((m) => subMonths(m, 1))}
-            className="px-3 py-1 border rounded"
+            className="px-3 py-1 border rounded cursor-pointer"
           >
             Prev
           </button>
           <button
             onClick={() => setMonth((m) => addMonths(m, 1))}
-            className="px-3 py-1 border rounded"
+            className="px-3 py-1 border rounded cursor-pointer"
           >
             Next
           </button>
@@ -387,7 +387,7 @@ export default function AttendanceTable({
 
           <button
             onClick={() => markAll("P")}
-            className="px-3 py-1 bg-green-600 text-white rounded"
+            className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer"
           >
             Mark All P
           </button>
@@ -396,7 +396,7 @@ export default function AttendanceTable({
 
           <button
             onClick={() => setShowExport(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
           >
             <Import size={16} /> Export Data
           </button>

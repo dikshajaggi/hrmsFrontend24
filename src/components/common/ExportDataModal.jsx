@@ -1,6 +1,8 @@
 import { useExport } from "@/hooks/useExport";
 import { X } from "lucide-react";
 import React, {useMemo } from "react";
+import ModernSelect from "./ModernSelect";
+import ExportModuleDropdowns from "./ExportModuleDropdowns";
 
 const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, attendanceData}) => {
   const dataToBeExported = modal === "attendance" ? attendanceData : data
@@ -90,61 +92,19 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, at
         <div className="space-y-4 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* branch */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Branch
-              </label>
-              <select
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                value={filters.branch}
-                onChange={(e) =>
-                  setFilters({ ...filters, branch: e.target.value })
-                }
-              >
-                <option value="">Select</option>
-                {branches.map((b) => (
-                  <option key={b}>{b}</option>
-                ))}
-              </select>
-            </div>
+            <ExportModuleDropdowns label="Branch" onChange={(val) =>
+                  setFilters({ ...filters, branch: val })
+                } value={filters.branch} options={branches} />
 
             {/* dept */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department
-              </label>
-              <select
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                value={filters.department}
-                onChange={(e) =>
-                  setFilters({ ...filters, department: e.target.value })
-                }
-              >
-                <option value="">Select</option>
-                {departments.map((d) => (
-                  <option key={d}>{d}</option>
-                ))}
-              </select>
-            </div>
+              <ExportModuleDropdowns label="Department" onChange={(val) =>
+                  setFilters({ ...filters, department: val })
+                } value={filters.department} options={departments} />
 
             {/* site */}
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Project Site
-              </label>
-              <select
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                value={filters.projectSite}
-                onChange={(e) =>
-                  setFilters({ ...filters, projectSite: e.target.value })
-                }
-              >
-                <option value="">Select</option>
-                {sites.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </div>
+             <ExportModuleDropdowns label="Project Site" onChange={(val) =>
+                  setFilters({ ...filters, projectSite: val })
+                } value={filters.projectSite} options={sites} />
           </div>
         </div>
 

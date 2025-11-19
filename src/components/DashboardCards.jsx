@@ -1,50 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { attendanceData } from "../assets/sampleData";
-import BranchSelect from "@/components/BranchSelect";
-import TodoCard from "@/components/TodoCard";
+import {BranchSelect, ProjectSiteSelect } from "@/components/BranchProjectSiteSelect";
 
 
 const DashboardCards = () => {
-    const [selectedBranch, setSelectedBranch] = useState("all");
+    const [selectedBranch, setSelectedBranch] = useState("Head Office");
+    const [selectedSite, setSelectedSite] = useState("Head Site 1")
     const [displayData, setDisplayData] = useState([])
 
-    const getAllBranchesData = (data) => {
-      const totals = {};
-
-      data.branches.forEach(branch => {
-          branch.attendanceStats.forEach(stat => {
-          totals[stat.id] = (totals[stat.id] || 0) + stat.count;
-          });
-      });
-
-      return Object.keys(totals).map((key) => {
-          const sample = data.branches[0].attendanceStats.find(stat => stat.id === key);
-          return {
-          id: key,
-          label: sample.label,
-          count: totals[key],
-          color: sample.color,
-          };
-      });
-    };
-
     useEffect(() => {
-      const displayedData = selectedBranch === "all"
-        ? getAllBranchesData(attendanceData)
-        : attendanceData.branches.find(b => b.branchName.toLowerCase() === selectedBranch.toLowerCase())?.attendanceStats || [];
-        console.log(displayedData, "displayedData", attendanceData, selectedBranch)
-      setDisplayData(displayedData)
+      // setDisplayData(displayedData)
+      console.log(selectedBranch, "selected branch")
     }, [selectedBranch])
     
     console.log(selectedBranch, "selectedBranch")
     return (
       <section className="w-full">
         {/* Branch Selector */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-gray-200 capitalize">
             {selectedBranch === "all" ? `Today’s Attendance – All Branches` : `Today’s Attendance – ${selectedBranch}`}
           </h2>
-          <BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch}/>
+          <div className="flex flex-wrap items-center gap-4">
+            <div><BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} /></div>
+            <div><ProjectSiteSelect selectedSite={selectedSite} setSelectedSite={setSelectedSite} /></div>
+          </div>
         </div>
 
         {/* Attendance Cards */}

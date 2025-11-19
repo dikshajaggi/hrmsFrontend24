@@ -14,6 +14,12 @@ export const getBranches = async () => {
   return res.data.data;
 }
 
+//----------------------project site apis-----------------------
+export const getProjectSites = async () => {
+ const res = await api.get("/projectSite");
+  return res.data.data;
+}
+
 //----------------------employee apis-----------------------
 export const getEmployees = async () => {
   const res = await api.get("/emp");

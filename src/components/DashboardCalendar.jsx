@@ -3,15 +3,15 @@ import "react-day-picker/style.css";
 import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { allBranchesCalendarData } from "@/assets/sampleData";
-import BranchSelect from "./BranchSelect";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {BranchSelect, ProjectSiteSelect} from "./BranchProjectSiteSelect";
 
 
 const DashboardCalendar = () => {
-  const [selectedBranch, setSelectedBranch] = useState("all");
+  const [selectedBranch, setSelectedBranch] = useState("Head Office");
   const [modifiers, setModifiers] = useState([])
   const [month, setMonth] = useState(new Date())
   const [holidays, setHolidays] = useState([])
+  const [selectedSite, setSelectedSite] = useState("Head Site 1")
   const calendarData = allBranchesCalendarData.branches
 
   const modifiersStyles = {
@@ -63,7 +63,10 @@ const DashboardCalendar = () => {
       </div>
 
       <div className="flex flex-wrap flex-col justify-start w-full md:w-1/3 gap-3 mt-2 text-sm">
-        <BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} />
+        <div className="flex flex-col flex-wrap gap-4">
+          <div><BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} /></div>
+          <div><ProjectSiteSelect selectedSite={selectedSite} setSelectedSite={setSelectedSite} /></div>
+        </div>
         <Legend color="bg-green-600" label="Holiday" />
         <Legend color="bg-amber-500" label="Saturday Off" />
         <div className="mt-3">

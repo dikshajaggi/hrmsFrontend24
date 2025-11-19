@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { sampleData } from "../assets/sampleData.js";
 import DashboardLoading from './DashboardLoading.jsx';
-import BranchSelect from './BranchSelect.jsx';
+import {BranchSelect} from './BranchProjectSiteSelect.jsx';
 import './calendar-modern.css';
 
 const localizer = momentLocalizer(moment);
@@ -14,7 +14,8 @@ const CommonCalendar = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [selectedBranch, setSelectedBranch] = useState("delhi");
+  const [selectedBranch, setSelectedBranch] = useState("head office");
+  const [selectedSite, setSelectedSite] = useState("Head Site 1")
 
   const fetchCalendarEvents = async () => {
     setLoading(true);
