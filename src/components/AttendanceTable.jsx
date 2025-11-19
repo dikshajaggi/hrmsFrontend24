@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -39,7 +39,7 @@ export default function AttendanceTable({
   const [attendance, setAttendance] = useState({});
   const [month, setMonth] = useState(initialMonth);
   const [showExport, setShowExport] = useState(false);
-
+  const [openCell, setOpenCell] = useState(null); 
 
 
   const days = useMemo(
@@ -88,23 +88,23 @@ export default function AttendanceTable({
     }));
   };
 
-  const markAll = (status) => {
-    setAttendance((prev) => {
-      const next = { ...prev };
-      employees.forEach((emp) => {
-        next[emp.employee_id] = { ...(next[emp.employee_id] || {}) };
-        days.forEach((d) => {
-          const dateStr = format(d, "yyyy-MM-dd");
-          const isSunday = sundays.includes(dateStr);
-          const isHoliday = holidays.includes(dateStr) || isSunday;
-          const isSaturday = saturdays.includes(dateStr);
-          const disabled = isHoliday || isSaturday;
-          if (!disabled) next[emp.employee_id][dateStr] = status;
-        });
-      });
-      return next;
-    });
-  };
+  // const markAll = (status) => {
+  //   setAttendance((prev) => {
+  //     const next = { ...prev };
+  //     employees.forEach((emp) => {
+  //       next[emp.employee_id] = { ...(next[emp.employee_id] || {}) };
+  //       days.forEach((d) => {
+  //         const dateStr = format(d, "yyyy-MM-dd");
+  //         const isSunday = sundays.includes(dateStr);
+  //         const isHoliday = holidays.includes(dateStr) || isSunday;
+  //         const isSaturday = saturdays.includes(dateStr);
+  //         const disabled = isHoliday || isSaturday;
+  //         if (!disabled) next[emp.employee_id][dateStr] = status;
+  //       });
+  //     });
+  //     return next;
+  //   });
+  // };
 
   // Totals
   const totals = useMemo(() => {
@@ -201,6 +201,9 @@ export default function AttendanceTable({
                 value={value}
                 disabled={isHolidayLocal || isSaturdayLocal}
                 onChange={(v) => handleChange(emp.employee_id, dateStr, v)}
+                isOpen={openCell?.empId === emp.employee_id && openCell?.dateStr === dateStr}
+                onOpen={() => setOpenCell({ empId: emp.employee_id, dateStr })}
+                onClose={() => setOpenCell(null)}
               />
             </div>
           );
@@ -357,8 +360,14 @@ export default function AttendanceTable({
   };
 
   const saveChanges = () => {
-    
+
   }
+
+  useEffect(() => {
+  const close = () => setOpenCell(null);
+  document.addEventListener("click", close);
+  return () => document.removeEventListener("click", close);
+}, []);
 
 
   return (

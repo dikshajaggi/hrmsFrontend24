@@ -38,14 +38,26 @@ const OPTIONS = Object.keys(ATTENDANCE_CODES);
 // =======================
 //  DROPDOWN CELL
 // =======================
-export const AttendanceCell = ({ value, disabled, onChange }) => {
-  const [open, setOpen] = useState(false);
+export const AttendanceCell = ({ value, disabled, onChange,  isOpen, onOpen, onClose }) => {
   const color = ATTENDANCE_CODES[value]?.color || "bg-gray-50 text-gray-400";
+
+  const toggle = (e) => {
+    e.stopPropagation();                // prevent table clicking closing immediately
+    if (disabled) return;
+    if (isOpen) onClose();
+    else onOpen();
+  };
+
+  const handleSelect = (opt) => {
+    onChange(opt);
+    onClose();
+  };
+
 
   return (
     <div className="relative min-w-[40px]">
       <button
-        onClick={() => !disabled && setOpen((s) => !s)}
+        onClick={toggle}
         className={`w-full px-1.5 md:px-2 py-1 rounded-md text-[10px] md:text-xs flex items-center justify-center ${color}`}
         disabled={disabled}
       >
@@ -53,17 +65,13 @@ export const AttendanceCell = ({ value, disabled, onChange }) => {
         {!disabled && <ChevronDown size={12} className="ml-1" />}
       </button>
 
-      {open && (
+      {isOpen && (
         <div
           className="absolute z-50 mt-1 w-64 bg-white border rounded-lg shadow"
-          onMouseLeave={() => setOpen(false)}
         >
           <div
             className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
-            onClick={() => {
-              onChange("");
-              setOpen(false);
-            }}
+            onClick={() => handleSelect("")}
           >
             Clear
           </div>
@@ -72,10 +80,7 @@ export const AttendanceCell = ({ value, disabled, onChange }) => {
             <div
               key={opt}
               className="px-3 py-2 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => {
-                onChange(opt);
-                setOpen(false);
-              }}
+              onClick={() => handleSelect(opt)}
             >
               <span
                 className={`w-6 h-6 rounded flex items-center justify-center text-xs font-semibold ${ATTENDANCE_CODES[opt].color}`}
