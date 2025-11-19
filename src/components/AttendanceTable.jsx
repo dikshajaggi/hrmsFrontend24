@@ -400,7 +400,7 @@ export default function AttendanceTable({
 
           <button
             onClick={saveChanges}
-            className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-green-600 text-white rounded cursor-pointer"
           >
             Save Chamges
           </button>

@@ -1,6 +1,5 @@
 import AttendanceTable from '@/components/AttendanceTable'
 import {BranchSelect, ProjectSiteSelect} from '@/components/BranchProjectSiteSelect'
-import CommonCalendar from '@/components/CommonCalendar'
 import DashboardCards from '@/components/DashboardCards'
 import React, { useState } from 'react'
 
@@ -20,6 +19,7 @@ const AttendanceManagement = () => {
   });
   return (
     <div className="px-6 xl:px-8 2xl:px-10 py-6 w-full">
+      <h1 className="text-2xl font-semibold mb-10">Attendance & Leave Management</h1>
       <DashboardCards />
         <div className="flex flex-col md:flex-row items-center justify-between mt-20">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-gray-200 capitalize">

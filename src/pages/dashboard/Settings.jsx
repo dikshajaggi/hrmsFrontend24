@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Plus,
   Trash2,
@@ -13,14 +13,23 @@ import "react-datepicker/dist/react-datepicker.css";
 import SaturdayOffCalendar from "@/components/CustomSaturdaySelector";
 import ImportDataModal from "@/components/common/ImportDataModal";
 import { Checkbox } from "@/components/ui/checkbox"
+import { useQuery, useQueryClient } from "react-query";
+import { getHolidays } from "@/apis";
 
 
 const AttendanceSettings = () => {
+    const { data: holidays1 = [] } = useQuery(
+      ["holidays"],
+      getHolidays,
+      { refetchOnWindowFocus: false }
+    );
+
   const [showModal, setShowModal] = useState(false);
+  const queryClient = useQueryClient();
 
   const [holidays, setHolidays] = useState([
-    { id: 1, name: "Republic Day", date: new Date(2025, 0, 26) },
-    { id: 2, name: "Holi", date: new Date(2025, 2, 14) },
+    { id: 1, description: "Republic Day", holiday_date: new Date(2025, 0, 26) },
+    { id: 2, description: "Holi", holiday_date: new Date(2025, 2, 14) },
   ]);
 
   const [offRule, setOffRule] = useState("2nd & 4th Saturdays");
@@ -32,12 +41,15 @@ const AttendanceSettings = () => {
   });
 
   const handleAddHoliday = () => {
-    setHolidays([...holidays, { id: Date.now(), name: "", date: new Date() }]);
+    setHolidays([...holidays, { id: Date.now(), description: "", holiday_date: new Date() }]);
   };
   const handleDeleteHoliday = (id) => {
     setHolidays(holidays.filter((h) => h.id !== id));
   };
 
+  useEffect(() => {
+    setHolidays(holidays1)
+  }, [holidays1])
 
   return (
     <div className="space-y-8 w-full">
@@ -77,7 +89,8 @@ const AttendanceSettings = () => {
         </div>
 
         {showModal && (
-          <ImportDataModal setShowModal={setShowModal}  />
+          <ImportDataModal setShowModal={setShowModal}  importType="master/holidays-data"
+          onSuccess={() => queryClient.invalidateQueries(["holidays"])} />
         )}
 
 
@@ -98,11 +111,11 @@ const AttendanceSettings = () => {
                 >
                   <td className="py-2 px-3">
                     <DatePicker
-                      selected={holiday.date}
+                      selected={holiday.holiday_date}
                       onChange={(date) =>
                         setHolidays((prev) =>
                           prev.map((h) =>
-                            h.id === holiday.id ? { ...h, date } : h
+                            h.id === holiday.id ? { ...h, holiday_date: date} : h
                           )
                         )
                       }
@@ -113,12 +126,12 @@ const AttendanceSettings = () => {
                   <td className="py-2 px-3">
                     <input
                       type="text"
-                      value={holiday.name}
+                      value={holiday.description}
                       onChange={(e) =>
                         setHolidays((prev) =>
                           prev.map((h) =>
                             h.id === holiday.id
-                              ? { ...h, name: e.target.value }
+                              ? { ...h, description: e.target.value }
                               : h
                           )
                         )
