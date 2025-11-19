@@ -8,6 +8,7 @@ export const importData = (importType, formData) => {
   });
 };
 
+
 //----------------------branch apis-----------------------
 export const getBranches = async () => {
  const res = await api.get("/branch");
@@ -17,6 +18,12 @@ export const getBranches = async () => {
 //----------------------project site apis-----------------------
 export const getProjectSites = async () => {
  const res = await api.get("/projectSite");
+  return res.data.data;
+}
+
+//----------------------department apis-----------------------
+export const getDepartments = async () => {
+ const res = await api.get("/department");
   return res.data.data;
 }
 

@@ -3,34 +3,30 @@ import { X } from "lucide-react";
 import React, {useMemo } from "react";
 import ModernSelect from "./ModernSelect";
 import ExportModuleDropdowns from "./ExportModuleDropdowns";
+import { getBranches, getDepartments, getProjectSites } from "@/apis";
+import { useQuery } from "react-query";
 
 const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, attendanceData}) => {
   const dataToBeExported = modal === "attendance" ? attendanceData : data
   const { exportData } = useExport(dataToBeExported);
 
-  const branches = useMemo(() => {
-    const items = data
-      .map(emp => emp.branch?.branch_name)
-      .filter(Boolean); 
-    
-    return ["All", ...new Set(items)];
-  }, [data]);
+  const { data: branches = [] } = useQuery(
+    ["branches"],
+    getBranches,
+    { refetchOnWindowFocus: false }
+  );
 
-  const departments = useMemo(() => {
-    const items = data
-      .map(emp => emp.department?.department_name)
-      .filter(Boolean); 
-    
-    return ["All", ...new Set(items)];
-  }, [data]);
+  const { data: departments = [] } = useQuery(
+  ["departments"],
+  getDepartments,
+  { refetchOnWindowFocus: false }
+);
 
-  const sites = useMemo(() => {
-    const items = data
-      .map(emp => emp.projectSite?.site_name)
-      .filter(Boolean);
-
-    return ["All", ...new Set(items)];
-  }, [data]);
+  const { data: sites = [] } = useQuery(
+    ["projectSites"],
+    getProjectSites,
+    { refetchOnWindowFocus: false }
+  );
 
   const formatDate = (date) =>
     date.toLocaleDateString("en-US", {
@@ -63,7 +59,7 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, at
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-999 p-4">
       <div className="bg-white/90 border border-gray-200 shadow-xl rounded-2xl w-full max-w-lg p-6 relative overflow-y-auto max-h-[90vh] transition-all">
         {/* close */}
         <button
@@ -94,17 +90,17 @@ const ExportDataModal = ({ isOpen, onClose, modal, data, filters, setFilters, at
             {/* branch */}
             <ExportModuleDropdowns label="Branch" onChange={(val) =>
                   setFilters({ ...filters, branch: val })
-                } value={filters.branch} options={branches} />
+                } value={filters.branch} options={branches.map(item => item.branch_name)} />
 
             {/* dept */}
               <ExportModuleDropdowns label="Department" onChange={(val) =>
                   setFilters({ ...filters, department: val })
-                } value={filters.department} options={departments} />
+                } value={filters.department} options={departments.map(item => item.department_name)} />
 
             {/* site */}
              <ExportModuleDropdowns label="Project Site" onChange={(val) =>
                   setFilters({ ...filters, projectSite: val })
-                } value={filters.projectSite} options={sites} />
+                } value={filters.projectSite} options={sites.map(item => item.site_name)} />
           </div>
         </div>
 

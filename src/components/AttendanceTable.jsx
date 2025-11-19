@@ -356,6 +356,10 @@ export default function AttendanceTable({
     return exportObj;
   };
 
+  const saveChanges = () => {
+    
+  }
+
 
   return (
     <div className="w-full p-2 md:p-4 bg-white border rounded-xl max-w-full overflow-x-auto">
@@ -386,10 +390,10 @@ export default function AttendanceTable({
           <div className="border-l h-6" />
 
           <button
-            onClick={() => markAll("P")}
+            onClick={saveChanges}
             className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer"
           >
-            Mark All P
+            Save Chamges
           </button>
 
           <div className="border-l h-6" />

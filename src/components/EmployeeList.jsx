@@ -3,7 +3,7 @@ import EmployeeTableView from "./EmployeeTableView";
 import EmployeeCardView from "./EmployeeCardView";
 import { LayoutGrid, LayoutList } from "lucide-react";
 import ModernSelect from "./common/ModernSelect";
-import { getEmployees } from "@/apis";
+import { getBranches, getDepartments, getEmployees, getProjectSites } from "@/apis";
 import { useQuery } from "react-query";
 
 const EmployeeList = () => {
@@ -26,30 +26,23 @@ const EmployeeList = () => {
     // To avoid recalculating on every render
     // It updates only when employees change (like after import)
 
-  const branches = useMemo(() => {
-    const items = employees
-      .map(emp => emp.branch?.branch_name)
-      .filter(Boolean); 
-    
-    return ["All", ...new Set(items)];
-  }, [employees]);
+    const { data: branches = [] } = useQuery(
+      ["branches"],
+      getBranches,
+      { refetchOnWindowFocus: false }
+    );
 
-  const departments = useMemo(() => {
-    const items = employees
-      .map(emp => emp.department?.department_name)
-      .filter(Boolean); 
-    
-    return ["All", ...new Set(items)];
-  }, [employees]);
+    const { data: departments = [] } = useQuery(
+    ["departments"],
+    getDepartments,
+    { refetchOnWindowFocus: false }
+  );
 
-  const sites = useMemo(() => {
-    const items = employees
-      .map(emp => emp.projectSite?.site_name)
-      .filter(Boolean);
-
-    return ["All", ...new Set(items)];
-  }, [employees]);
-
+  const { data: sites = [] } = useQuery(
+    ["projectSites"],
+    getProjectSites,
+    { refetchOnWindowFocus: false }
+  );
 
   // const employees = [
   //   {
@@ -163,7 +156,7 @@ const EmployeeList = () => {
   // ];
 
 
-  console.log(employees, "employees")
+  console.log(employees, "employees", sites, branches)
   
   const filteredEmployees = useMemo(() => {
     return employees.filter((emp) => {
@@ -236,7 +229,7 @@ const EmployeeList = () => {
           <div className="relative group">
             <ModernSelect
               label="Branch"
-              options={branches}
+              options={branches.map(item => item.branch_name)}
               value={filters.branch}
               onChange={(val) => setFilters({ ...filters, branch: val })}
             />
@@ -246,7 +239,7 @@ const EmployeeList = () => {
           <div className="relative group">
              <ModernSelect
               label="Department"
-              options={departments}
+              options={departments.map(item => item.department_name)}
               value={filters.department}
               onChange={(val) => setFilters({ ...filters, department: val })}
             />
@@ -256,7 +249,7 @@ const EmployeeList = () => {
           <div className="relative group">
              <ModernSelect
               label="Project Site"
-              options={sites}
+              options={sites.map(item => item.site_name)}
               value={filters.projectSite}
               onChange={(val) => setFilters({ ...filters, projectSite: val })}
             />

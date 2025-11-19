@@ -21,7 +21,7 @@ const AttendanceManagement = () => {
   return (
     <div className="px-6 xl:px-8 2xl:px-10 py-6 w-full">
       <DashboardCards />
-        <div className="flex flex-col md:flex-row items-center justify-between mt-10">
+        <div className="flex flex-col md:flex-row items-center justify-between mt-20">
           <h2 className="text-base md:text-xl font-semibold text-gray-800 dark:text-gray-200 capitalize">
             {selectedBranch === "all" ? `This month’s attendance – All Branches ` : `This month’s attendance – ${selectedBranch}`}
           </h2>

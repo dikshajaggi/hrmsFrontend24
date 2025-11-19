@@ -27,7 +27,7 @@ export const BranchSelect = ({ selectedBranch, setSelectedBranch }) => {
   }, [isLoading, branches]);
 
   // ADD "ALL" + branch names
-  const options = ["ALL", ...branches.map(b => b.branch_name)];
+  const options = branches.map(b => b.branch_name);
 
   return (
     <ModernSelect
@@ -63,7 +63,7 @@ export const ProjectSiteSelect = ({ selectedSite, setSelectedSite }) => {
 
 
   // ADD "ALL" + project names
-  const options = ["ALL", ...projectSites.map(b => b.site_name)];
+  const options = projectSites.map(b => b.site_name);
 
   return (
     <ModernSelect

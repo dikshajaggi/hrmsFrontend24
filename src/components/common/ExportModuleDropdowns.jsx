@@ -28,7 +28,7 @@ const ExportModuleDropdowns = ({ label, options, value, onChange }) => {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:shadow-sm"
+        className="cursor-pointer w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:shadow-sm"
       >
         <span>{value || options[0]}</span>
         <ChevronDown
@@ -46,8 +46,9 @@ const ExportModuleDropdowns = ({ label, options, value, onChange }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
-          >
+            className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden overflow-y-auto max-h-52   /* FIXED HEIGHT + SCROLL */ 
+                       scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                       
             {options.map((opt) => (
               <li
                 key={opt}
