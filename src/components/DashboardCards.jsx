@@ -4,12 +4,12 @@ import {BranchSelect, ProjectSiteSelect } from "@/components/BranchProjectSiteSe
 
 const DashboardCards = () => {
   const DEFAULT_CARDS = [
-  { id: "T", label: "Total", color: "text-blue-500" , count: 0 },
-  { id: "P", label: "Present", color: "text-green-500", count: 0 },
-  { id: "L", label: "Casual Leave", color: "text-yellow-500" , count: 0 },
-  { id: "SL", label: "Sick Leave", color: "text-red-500", count: 0 },
-  { id: "W", label: "Work From Home", count: 2, color: "text-purple-500" },
-];
+    { id: "T", label: "Total", color: "text-blue-500" , count: 0 },
+    { id: "P", label: "Present", color: "text-green-500", count: 0 },
+    { id: "L", label: "Casual Leave", color: "text-yellow-500" , count: 0 },
+    { id: "SL", label: "Sick Leave", color: "text-red-500", count: 0 },
+    { id: "W", label: "Work From Home", count: 0, color: "text-purple-500" },
+  ];
 
     const [selectedBranch, setSelectedBranch] = useState("Head Office");
     const [selectedSite, setSelectedSite] = useState("Head Site 1")

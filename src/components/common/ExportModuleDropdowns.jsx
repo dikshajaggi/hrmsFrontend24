@@ -46,7 +46,7 @@ const ExportModuleDropdowns = ({ label, options, value, onChange }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden overflow-y-auto max-h-52   /* FIXED HEIGHT + SCROLL */ 
+            className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-y-auto max-h-52   /* FIXED HEIGHT + SCROLL */ 
                        scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                        
             {options.map((opt) => (

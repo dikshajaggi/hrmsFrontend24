@@ -2,7 +2,7 @@
 //  Attendance Codes
 
 import { format } from "date-fns";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Eraser } from "lucide-react";
 import { useState } from "react";
 
 // =======================
@@ -67,19 +67,20 @@ export const AttendanceCell = ({ value, disabled, onChange,  isOpen, onOpen, onC
 
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 w-64 bg-white border rounded-lg shadow"
+          className="absolute z-50 mt-1 w-64 bg-white border rounded-lg shadow overflow-y-auto max-h-64   /* FIXED HEIGHT + SCROLL */ 
+                       scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
         >
           <div
-            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+            className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 flex items-center gap-3"
             onClick={() => handleSelect("")}
           >
-            Clear
+            <Eraser size={19} /> Clear
           </div>
 
           {OPTIONS.map((opt) => (
             <div
               key={opt}
-              className="px-3 py-2 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-100"
+              className="px-3 py-2 text-sm flex items-center gap-2 cursor-pointer hover:bg-gray-100" 
               onClick={() => handleSelect(opt)}
             >
               <span
