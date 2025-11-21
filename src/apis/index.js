@@ -27,11 +27,15 @@ export const getDepartments = async () => {
 }
 
 //----------------------holiday and leave apis-----------------------
-export const getHolidays = async () => {
-  const res = await api.get("/holidays");
+export const getHolidays = async ({ queryKey }) => {
+  const [_key, { branch_id, site_id, year }] = queryKey;
+
+  const res = await api.get("/holidays", {
+    params: { branch_id, site_id, year }
+  });
+
   return res.data.data;
 };
-
 
 //----------------------employee apis-----------------------
 export const getEmployees = async () => {

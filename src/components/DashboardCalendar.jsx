@@ -1,56 +1,85 @@
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 import { format, parseISO } from "date-fns";
-import { useEffect, useState } from "react";
-import { allBranchesCalendarData } from "@/assets/sampleData";
-import {BranchSelect, ProjectSiteSelect} from "./BranchProjectSiteSelect";
-
+import { useMemo, useState } from "react";
+import { BranchSelect, ProjectSiteSelect } from "./BranchProjectSiteSelect";
+import { useQuery } from "react-query";
+import { getHolidays } from "@/apis";
 
 const DashboardCalendar = () => {
-  const [selectedBranch, setSelectedBranch] = useState("Head Office");
-  const [modifiers, setModifiers] = useState([])
-  const [month, setMonth] = useState(new Date())
-  const [holidays, setHolidays] = useState([])
-  const [selectedSite, setSelectedSite] = useState("Head Site 1")
-  const calendarData = allBranchesCalendarData.branches
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [selectedSite, setSelectedSite] = useState(null);
+  const [month, setMonth] = useState(new Date());
 
-  const modifiersStyles = {
-    holidays: { backgroundColor: "#16a34a", color: "white", borderRadius: "50%", margin: "2px"}, // green
-    weekends: { backgroundColor: "#f59e0b", color: "white", borderRadius: "50%", margin: "2px"}, // orange
-    sundays: { color: "red" }
-  };
+  // Extract year only once
+  const year = month.getFullYear();
 
-  useEffect(() => {
-    // Combine all branch data if "All" is selected
-    const events =
-      selectedBranch === "all"
-        ? calendarData.flatMap(branch => branch.events)
-        : calendarData.find(b => b.branch_name.toLowerCase() === selectedBranch.toLowerCase())?.events || [];
-    const uniqueEvents = Array.from(
-      new Map(events.map(e => [e.holiday_id || `${e.date}-${e.description}`, e])).values()
-    );
-    console.log(events, "events", uniqueEvents)
-    const holidaysList =  uniqueEvents.filter(e => e.type === "holiday").filter(e => {
-    const date = parseISO(e.date);
+  // Selected IDs
+  const branch_id = selectedBranch?.id ?? null;
+  const site_id = selectedSite?.id ?? null;
+
+  // CALL ONLY YEAR API
+  const { data: allHolidays = [], isLoading } = useQuery(
+    [
+      "holidays",
+      {
+        branch_id,
+        site_id,
+        year,
+      },
+    ],
+    getHolidays, // Now this API should IGNORE month and only accept year
+    {
+      refetchOnWindowFocus: false,
+      keepPreviousData: true,
+      staleTime: 1000 * 60 * 60 * 12, // 12 hrs cache
+    }
+  );
+
+  // FILTER HOLIDAYS FOR MONTH LOCALLY
+  const holidays = useMemo(() => {
+    return allHolidays.filter((h) => {
+      const d = parseISO(h.holiday_date);
       return (
-        date.getMonth() === month.getMonth() &&
-        date.getFullYear() === month.getFullYear()
+        d.getFullYear() === year && d.getMonth() === month.getMonth()
       );
     });
-    setHolidays(holidaysList)
-        // Group dates by event type
-    const modifiers = {
-      holidays: events.filter(e => e.type === "holiday").map(e => parseISO(e.date)),
-      weekends: events.filter(e => e.type === "saturday_off").map(e => parseISO(e.date)),
-      sundays: { dayOfWeek: [0] } // 0 = Sunday
-    };
-    setModifiers(modifiers)
-  }, [selectedBranch, month])
+  }, [allHolidays, month, year]);
 
-  console.log(modifiers, "modifiers")
+  // Dates for DayPicker highlight
+  const holidayDates = useMemo(
+    () => holidays.map((h) => parseISO(h.holiday_date)),
+    [holidays]
+  );
+
+  const modifiers = useMemo(
+    () => ({
+      holidays: holidayDates,
+      weekends: { daysOfWeek: [6] }, // Saturday
+    }),
+    [holidayDates]
+  );
+
+  const modifiersStyles = {
+    holidays: {
+      backgroundColor: "#16a34a",
+      color: "white",
+      borderRadius: "50%",
+      margin: "2px",
+    },
+    weekends: {
+      backgroundColor: "#f59e0b",
+      color: "white",
+      borderRadius: "50%",
+      margin: "2px",
+    },
+    sundays: { color: "red" },
+  };
 
   return (
     <div className="p-4 bg-white rounded-xl shadow-md w-full h-full flex flex-col md:flex-row md:items-start md:justify-between">
+
+      {/* Calendar */}
       <div className="flex justify-center md:justify-start w-full md:w-2/3">
         <DayPicker
           showOutsideDays
@@ -62,22 +91,40 @@ const DashboardCalendar = () => {
         />
       </div>
 
+      {/* Right Side Panel */}
       <div className="flex flex-wrap flex-col justify-start w-full md:w-1/3 gap-3 mt-2 text-sm">
+
+        {/* Dropdowns */}
         <div className="flex flex-col flex-wrap gap-4">
-          <div><BranchSelect selectedBranch={selectedBranch} setSelectedBranch={setSelectedBranch} /></div>
-          <div><ProjectSiteSelect selectedSite={selectedSite} setSelectedSite={setSelectedSite} /></div>
+          <BranchSelect
+            selectedBranch={selectedBranch}
+            setSelectedBranch={setSelectedBranch}
+          />
+          <ProjectSiteSelect
+            selectedSite={selectedSite}
+            setSelectedSite={setSelectedSite}
+          />
         </div>
+
         <Legend color="bg-green-600" label="Holiday" />
         <Legend color="bg-amber-500" label="Saturday Off" />
+
+        {/* Holidays List */}
         <div className="mt-3">
           <h4 className="font-semibold text-sm">Holidays this Month</h4>
+
           <ul className="text-xs space-y-1 max-h-24 mt-2 overflow-y-auto pr-1">
-            {holidays.length === 0 ? (
+            {isLoading ? (
+              <li className="text-gray-500 italic font-semibold">Loading...</li>
+            ) : holidays.length === 0 ? (
               <li className="text-gray-500 italic font-semibold">No Holidays</li>
             ) : (
               holidays.map((e, i) => (
                 <li key={i}>
-                <span className="font-semibold">{format(parseISO(e.date), "d MMMM")}</span> – {e.description}
+                  <span className="font-semibold">
+                    {format(parseISO(e.holiday_date), "d MMMM")}
+                  </span>{" "}
+                  – {e.description}
                 </li>
               ))
             )}
@@ -86,7 +133,7 @@ const DashboardCalendar = () => {
       </div>
     </div>
   );
-}
+};
 
 function Legend({ color, label }) {
   return (
@@ -97,5 +144,4 @@ function Legend({ color, label }) {
   );
 }
 
-
-export default DashboardCalendar
+export default DashboardCalendar;

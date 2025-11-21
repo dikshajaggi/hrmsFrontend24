@@ -18,11 +18,24 @@ import { getHolidays } from "@/apis";
 
 
 const AttendanceSettings = () => {
-    const { data: holidays1 = [] } = useQuery(
-      ["holidays"],
-      getHolidays,
-      { refetchOnWindowFocus: false }
-    );
+// const [selectedBranch, setSelectedBranch] = useState(null)
+// const [selectedSite, setSelectedSite] = useState(null)
+const month = new Date()
+const year = month.getFullYear();
+
+
+const { data: holidays1 = [] } = useQuery(
+  [
+    "holidays",
+    {
+      branch_id: null ,
+      site_id: null ,
+      year: year
+    },
+  ],
+  getHolidays,
+  { refetchOnWindowFocus: false }
+);
 
   const [showModal, setShowModal] = useState(false);
   const queryClient = useQueryClient();
@@ -99,7 +112,7 @@ const AttendanceSettings = () => {
             <thead className="bg-gray-50 border-b text-gray-600">
               <tr>
                 <th className="text-left py-2 px-3">Date</th>
-                <th className="text-left py-2 px-3">Name</th>
+                <th className="text-left py-2 px-3">Holiday</th>
                 <th className="text-left py-2 px-3 w-16">Action</th>
               </tr>
             </thead>
