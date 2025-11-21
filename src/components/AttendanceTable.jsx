@@ -17,30 +17,66 @@ import { Import } from "lucide-react";
 import ExportDataModal from "./common/ExportDataModal";
 import { AttendanceCell, DesktopTable, MobileCards } from "./AttendanceTableUtils";
 import { useQuery } from "react-query";
-import { getEmployees } from "@/apis";
+import { getEmployees, getHolidays, getSaturdayOffs } from "@/apis";
 
 
 export default function AttendanceTable({
   filters,
   setFilters,
-  initialMonth = new Date(),
-  bankHolidays = [],
-  saturdayOffs = [
-    { date: "2025-11-08", week: 2 },
-    { date: "2025-11-22", week: 4 },
-  ],
 }) {
+
+  const initialMonth = new Date()
+
+  const [attendance, setAttendance] = useState({});
+  const [month, setMonth] = useState(initialMonth);
+  const [showExport, setShowExport] = useState(false);
+  const [openCell, setOpenCell] = useState(null); 
+  const year = month.getFullYear();
+
   
+  const { data: holidays = [] } = useQuery(
+    [
+      "holidays",
+      {
+        branch_id: null ,
+        site_id: null ,
+        year: year
+      },
+    ],
+    getHolidays,
+    { refetchOnWindowFocus: false }
+  );
+
+  const bankHolidays = useMemo(
+    () => holidays.map(h => h.holiday_date.slice(0, 10)),
+    [holidays]
+  );
+  
+  const { data: saturdayOffData = {} } = useQuery(
+    [
+      "saturdayOffData",
+      {
+        branch_id: null ,
+        site_id: null ,
+        year: year,
+        month: month.getMonth()
+      },
+    ],
+    getSaturdayOffs,
+    { refetchOnWindowFocus: false }
+  );
+
+  const saturdayOffs = useMemo(
+    () => (saturdayOffData.saturday_offs || []).map(d => d.slice(0, 10)),
+    [saturdayOffData]
+  );
+
+  console.log(saturdayOffs, "saturdayOffs")
   const { data: employees = [] } = useQuery(
     ["employees"],
     getEmployees,
     { refetchOnWindowFocus: false }
   );
-  const [attendance, setAttendance] = useState({});
-  const [month, setMonth] = useState(initialMonth);
-  const [showExport, setShowExport] = useState(false);
-  const [openCell, setOpenCell] = useState(null); 
-
 
   const days = useMemo(
     () =>
@@ -58,28 +94,6 @@ export default function AttendanceTable({
         .map((d) => format(d, "yyyy-MM-dd")),
     [days]
   );
-
-  const holidays = useMemo(() => {
-    return (bankHolidays || [])
-      .map((d) => {
-        if (!d) return null;
-        if (typeof d === "string") return format(new Date(d), "yyyy-MM-dd");
-        if (d.date) return format(new Date(d.date), "yyyy-MM-dd");
-        return null;
-      })
-      .filter(Boolean);
-  }, [bankHolidays]);
-
-  const saturdays = useMemo(() => {
-    return (saturdayOffs || [])
-      .map((d) => {
-        if (!d) return null;
-        if (typeof d === "string") return format(new Date(d), "yyyy-MM-dd");
-        if (d.date) return format(new Date(d.date), "yyyy-MM-dd");
-        return null;
-      })
-      .filter(Boolean);
-  }, [saturdayOffs]);
 
   const handleChange = (empId, dateStr, value) => {
     setAttendance((prev) => ({
@@ -126,8 +140,8 @@ export default function AttendanceTable({
       days.forEach((d) => {
         const dateStr = format(d, "yyyy-MM-dd");
         const isSunday = sundays.includes(dateStr);
-        const isHoliday = holidays.includes(dateStr) || isSunday;
-        const isSaturday = saturdays.includes(dateStr);
+        const isHoliday = bankHolidays.includes(dateStr) || isSunday;
+        const isSaturday = saturdayOffs.includes(dateStr);
         const auto = isHoliday ? "H" : isSaturday ? "S" : null;
         const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
         if (value && counts[value] !== undefined) counts[value] += 1;
@@ -137,7 +151,7 @@ export default function AttendanceTable({
       map[emp.employee_id] = counts;
     });
     return map;
-  }, [employees, attendance, days, holidays, saturdays, sundays]);
+  }, [employees, attendance, days, bankHolidays, saturdayOffs, sundays]);
 
   // Columns
   const columnHelper = createColumnHelper();
@@ -169,7 +183,7 @@ export default function AttendanceTable({
       const dateStr = format(day, "yyyy-MM-dd");
       const weekday = format(day, "EEE");
       const isSunday = sundays.includes(dateStr);
-      const isSaturday = saturdays.includes(dateStr);
+      const isSaturday = saturdayOffs.includes(dateStr);
 
       return columnHelper.display({
         id: dateStr,
@@ -186,8 +200,8 @@ export default function AttendanceTable({
         cell: ({ row }) => {
           const emp = row.original;
           const isSundayLocal = sundays.includes(dateStr);
-          const isHolidayLocal = holidays.includes(dateStr) || isSundayLocal;
-          const isSaturdayLocal = saturdays.includes(dateStr);
+          const isHolidayLocal = bankHolidays.includes(dateStr) || isSundayLocal;
+          const isSaturdayLocal = saturdayOffs.includes(dateStr);
           const auto = isHolidayLocal ? "H" : isSaturdayLocal ? "S" : null;
           const value = auto || attendance?.[emp.employee_id]?.[dateStr] || "";
 
@@ -240,7 +254,7 @@ export default function AttendanceTable({
     ];
 
     return [...base, ...dayCols, ...totalsCols];
-  }, [days, attendance, holidays, saturdays, sundays, totals]);
+  }, [days, attendance, bankHolidays, saturdayOffs, sundays, totals]);
 
   const table = useReactTable({
     data: employees,
@@ -326,8 +340,8 @@ export default function AttendanceTable({
         const dateStr = format(day, "yyyy-MM-dd");
 
         const isSunday = sundays.includes(dateStr);
-        const isHoliday = holidays.includes(dateStr) || isSunday;
-        const isSaturday = saturdays.includes(dateStr);
+        const isHoliday = bankHolidays.includes(dateStr) || isSunday;
+        const isSaturday = saturdayOffs.includes(dateStr);
 
         const auto = isHoliday ? "H" : isSaturday ? "S" : null;
 
@@ -400,7 +414,7 @@ export default function AttendanceTable({
 
           <button
             onClick={saveChanges}
-            className="px-4 py-2 rounded-lg bg-green-600 text-white rounded cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-green-600 text-white cursor-pointer"
           >
             Save Chamges
           </button>
@@ -417,7 +431,7 @@ export default function AttendanceTable({
       </div>
 
     {/* MBOILE CARDS VIEW */}
-    <MobileCards employees={employees} totals={totals} saturdays={saturdays} sundays={sundays} days={days} holidays={holidays} attendance={attendance} handleChange={handleChange} />
+    <MobileCards employees={employees} totals={totals} saturdays={saturdayOffs} sundays={sundays} days={days} holidays={bankHolidays} attendance={attendance} handleChange={handleChange} />
 
     {/* DESKTOP TABLE VIEW */}
     <DesktopTable table={table} flexRender={flexRender} />

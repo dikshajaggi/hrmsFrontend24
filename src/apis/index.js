@@ -26,7 +26,7 @@ export const getDepartments = async () => {
   return res.data.data;
 }
 
-//----------------------holiday and leave apis-----------------------
+//----------------------holiday and saturday off apis-----------------------
 export const getHolidays = async ({ queryKey }) => {
   const [_key, { branch_id, site_id, year }] = queryKey;
 
@@ -36,6 +36,28 @@ export const getHolidays = async ({ queryKey }) => {
 
   return res.data.data;
 };
+
+export const getSaturdayOffs = async ({ queryKey }) => {
+  const [_key, { branch_id, site_id, year, month }] = queryKey;
+
+  const res = await api.get("/saturdayOffs", {
+    params: { branch_id, site_id, year, month }
+  });
+
+  return res.data;
+};
+
+export const setSaturdayOffRule = async ({ branch_id, site_id, off_saturdays }) => {
+  const res = await api.post("/saturdayOffs/rule", {
+    branch_id,
+    site_id,
+    off_saturdays,
+  });
+
+  return res.data;
+};
+
+//----------------------leave apis-----------------------
 
 //----------------------employee apis-----------------------
 export const getEmployees = async () => {

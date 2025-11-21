@@ -13,13 +13,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import SaturdayOffCalendar from "@/components/CustomSaturdaySelector";
 import ImportDataModal from "@/components/common/ImportDataModal";
 import { Checkbox } from "@/components/ui/checkbox"
-import { useQuery, useQueryClient } from "react-query";
-import { getHolidays } from "@/apis";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { getHolidays, setSaturdayOffRule } from "@/apis";
 
 
 const AttendanceSettings = () => {
-// const [selectedBranch, setSelectedBranch] = useState(null)
-// const [selectedSite, setSelectedSite] = useState(null)
+const [selectedBranch, setSelectedBranch] = useState(null)
+const [selectedSite, setSelectedSite] = useState(null)
 const month = new Date()
 const year = month.getFullYear();
 
@@ -37,6 +37,17 @@ const { data: holidays1 = [] } = useQuery(
   { refetchOnWindowFocus: false }
 );
 
+const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
+  onSuccess: (data) => {
+    console.log("Saved:", data);
+    // toast.success("Saturday rule saved!");
+  },
+  onError: () => {
+    // toast.error("Failed to save rule");
+    console.error("Failed to save rule");
+  }
+});
+
   const [showModal, setShowModal] = useState(false);
   const queryClient = useQueryClient();
 
@@ -45,7 +56,7 @@ const { data: holidays1 = [] } = useQuery(
     { id: 2, description: "Holi", holiday_date: new Date(2025, 2, 14) },
   ]);
 
-  const [offRule, setOffRule] = useState("2nd & 4th Saturdays");
+  const [offRule, setOffRule] = useState(null);
 
   const [leavePolicy, setLeavePolicy] = useState({
     casual: 1,
@@ -60,6 +71,33 @@ const { data: holidays1 = [] } = useQuery(
     setHolidays(holidays.filter((h) => h.id !== id));
   };
 
+  const handleSave = () => {
+  if (offRule === "2nd & 4th Saturdays") {
+    setSelectedRule({
+      branch_id: selectedBranch,
+      site_id: selectedSite,
+      off_saturdays: [2, 4],
+    });
+  }
+
+  if (offRule === "All Saturdays") {
+    setSelectedRule({
+      branch_id: selectedBranch,
+      site_id: selectedSite,
+      off_saturdays: [1, 2, 3, 4, 5],
+    });
+  }
+
+  // if (offRule === "Custom Rule") {
+  //   setSelectedRule({
+  //     branch_id: selectedBranch,
+  //     site_id: selectedSite,
+  //     off_saturdays: customSelectedSaturdays, // array from your custom UI
+  //   });
+  // }
+};
+
+
   useEffect(() => {
     setHolidays(holidays1)
   }, [holidays1])
@@ -69,8 +107,7 @@ const { data: holidays1 = [] } = useQuery(
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-          <Settings className="text-blue-600" size={22} />
-          Attendance Settings
+        Attendance Settings
         </h2>
         <button className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition">
           <RefreshCcw size={16} /> Sync Changes
@@ -170,11 +207,11 @@ const { data: holidays1 = [] } = useQuery(
         <h3 className="text-lg font-semibold text-gray-800">
           Saturday Off Rule
         </h3>
+        <button onClick={handleSave} >Save Changes</button>
         <p className="text-xs mb-4 text-gray-500">*This will be applied to all the months except the <b>custom rule</b></p>
         <div className="flex flex-col sm:flex-row gap-4">
           {[
             "All Saturdays",
-            "Alternate Saturdays",
             "2nd & 4th Saturdays",
             "Custom Rule",
           ].map((rule) => (
@@ -199,7 +236,7 @@ const { data: holidays1 = [] } = useQuery(
         </div>
 
         {/* Custom Saturdays Calendar */}
-        {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.date)}/>}
+        {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}/>}
 
       </div>
 
