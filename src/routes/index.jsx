@@ -8,7 +8,7 @@ import EmployeeManagement from '@/pages/dashboard/EmployeeManagement';
 import OrgSetup from '@/pages/dashboard/OrgSetup';
 import PayrollManagement from '@/pages/dashboard/PayrollManagement';
 import PoliciesManagement from '@/pages/dashboard/PoliciesManagement';
-import RoleManagement from '@/pages/dashboard/RoleManagement';
+import RoleManagement from '@/pages/dashBoardSettings/RoleManagement';
 import General from '@/pages/dashBoardSettings/General';
 import HolidaysAndLeaves from '@/pages/dashBoardSettings/HolidaysAndLeaves';
 import SaturdayOffs from '@/pages/dashBoardSettings/SaturdayOffs';

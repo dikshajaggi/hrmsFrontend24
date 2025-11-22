@@ -1,13 +1,13 @@
 import React from 'react'
 
-const General = () => {
+const RoleManagement = () => {
   return (
-    <div className="p-6">
+    <div className= "P-6">
        <h3 className="text-lg font-semibold text-gray-800">
-         General Settings
+         Role & Access Management
         </h3>
     </div>
   )
 }
 
-export default General
+export default RoleManagement
