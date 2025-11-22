@@ -6,9 +6,19 @@ export const dashboardSidebar = [
     {main: "Employee Management", path: "/dashboard/emp-management", icon: Users},
     {main: "Attendance & Leave", path: "/dashboard/attendance-management", icon: SquareChartGantt},
     {main: "Payroll & Reimbursements", path: "/dashboard/payroll", icon: IndianRupee},
-    {main: "Holiday & Events", path: "/dashboard/holiday-management", icon: Calendar},
-    {main: "Organisation Management", path: "/dashboard/org-management", icon: Building2},
+    // {main: "Holiday & Events", path: "/dashboard/holiday-management", icon: Calendar},
+    {main: "Organisation Setup", path: "/dashboard/org-management", icon: Building2},
     {main: "Documents & Policies", path: "/dashboard/policies", icon: FolderClosed},
-    {main: "Role & Access", path: "/dashboard/role-management", icon: UserStar},
-    {main: "Settings", path: "/dashboard/settings", icon: Settings}
+      {
+        main: "Settings",
+        path: "/dashboard/settings",
+        icon: Settings,
+        children: [
+        { main: "General", path: "/dashboard/settings" },
+        { main: "Holidays & Leaves", path: "/dashboard/settings/holiday-leave-policies" },
+        { main: "Saturday Off Rules", path: "/dashboard/settings/saturday-off" },
+        // { main: "Attendance Rules", path: "/dashboard/settings/attendance" },
+        { main: "Role & Access", path: "/dashboard/settings/roles" }
+        ]
+    }
 ]

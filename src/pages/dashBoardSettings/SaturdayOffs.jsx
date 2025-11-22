@@ -1,10 +1,39 @@
-import { getSaturdayOffCustomRule, getSaturdayRule, setSaturdayOffCustomRule, setSaturdayOffRule } from '@/apis';
+import { getHolidays, getSaturdayOffCustomRule, getSaturdayRule, setSaturdayOffCustomRule, setSaturdayOffRule } from '@/apis';
 import SaturdayOffCalendar from '@/components/CustomSaturdaySelector';
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 
-const SaturdayOffs = ({selectedBranch, selectedSite, year, month, holidays}) => {
+const SaturdayOffs = () => {
+  
+  const [selectedBranch, setSelectedBranch] = useState(null)
+  const [selectedSite, setSelectedSite] = useState(null)
+  const month = new Date()
+  const year = month.getFullYear();
+  const [holidays, setHolidays] = useState([
+    { id: 1, description: "Republic Day", holiday_date: new Date(2025, 0, 26) },
+    { id: 2, description: "Holi", holiday_date: new Date(2025, 2, 14) },
+  ]);
+
+
+  const { data: holidays1 = [] } = useQuery(
+    [
+      "holidays",
+      {
+        branch_id: selectedBranch ,
+        site_id: selectedSite ,
+        year: year
+      },
+    ],
+    getHolidays,
+    { refetchOnWindowFocus: false }
+  );
+
+  useEffect(() => {
+    setHolidays(holidays1)
+  }, [holidays1])
+
+
     const queryClient = useQueryClient();
     const [customSelectedDates, setCustomSelectedDates] = useState([]); 
 

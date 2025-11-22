@@ -1,15 +1,17 @@
 import AuthLayout from '@/layouts/AuthLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import RootLayout from '@/layouts/RootLayout';
+import SettingsLayout from '@/layouts/SettingsLayout';
 import AttendanceManagement from '@/pages/dashboard/AttendanceManagement';
 import Dashboard from '@/pages/dashboard/Dashboard';
 import EmployeeManagement from '@/pages/dashboard/EmployeeManagement';
-import HolidayManagement from '@/pages/dashboard/HolidayManagement';
 import OrgSetup from '@/pages/dashboard/OrgSetup';
 import PayrollManagement from '@/pages/dashboard/PayrollManagement';
 import PoliciesManagement from '@/pages/dashboard/PoliciesManagement';
 import RoleManagement from '@/pages/dashboard/RoleManagement';
-import Settings from '@/pages/dashBoardSettings/Settings';
+import General from '@/pages/dashBoardSettings/General';
+import HolidaysAndLeaves from '@/pages/dashBoardSettings/HolidaysAndLeaves';
+import SaturdayOffs from '@/pages/dashBoardSettings/SaturdayOffs';
 import Login from '@/pages/Login';
 import NotFound from '@/pages/NotFound';
 
@@ -45,12 +47,19 @@ const router = createBrowserRouter([
           { index: true, element: <Dashboard /> },
           { path: "emp-management", element: <EmployeeManagement /> },
           { path: "attendance-management", element: <AttendanceManagement /> },
-          { path: "role-management", element: <RoleManagement /> },
           { path: "policies", element: <PoliciesManagement /> },
-          { path: "holiday-management", element: <HolidayManagement /> },
           { path: "payroll", element: <PayrollManagement /> },
           { path: "org-management", element: <OrgSetup />},
-          { path: "settings", element: <Settings /> },
+          {
+            path: "settings",
+            element: <SettingsLayout />, 
+            children: [
+              { index: true, element: <General /> },
+              { path: "holiday-leave-policies", element: <HolidaysAndLeaves /> },
+              { path: "saturday-off", element: <SaturdayOffs /> },
+              { path: "roles", element: <RoleManagement /> },
+            ]
+          },
         ]
       },
       { path: "*", element: <NotFound /> } 

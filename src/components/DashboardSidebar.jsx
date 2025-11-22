@@ -37,6 +37,7 @@ const DashboardSidebar = () => {
   const location = useLocation();
   const {collapsed, setCollapsed} = useContext(LayoutContext);
   const wrapperRef = useRef(null);
+  const [openMenus, setOpenMenus] = useState({});
 
   // Tooltip state (portal)
   const [tooltip, setTooltip] = useState({
@@ -67,6 +68,21 @@ const DashboardSidebar = () => {
   const handleHideTooltip = () => {
     setTooltip(prev => ({ ...prev, visible: false }));
   };
+
+  const toggleMenu = (key) => {
+    setOpenMenus(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  useEffect(() => {
+    dashboardSidebar.forEach(item => {
+      if (item.children) {
+        const isChildActive = item.children.some(c => location.pathname === c.path);
+        if (isChildActive) {
+          setOpenMenus(prev => ({ ...prev, [item.main]: true }));
+        }
+      }
+    });
+  }, [location.pathname]);
 
   return (
     <div className="relative"> {/* wrapper for layout - no overflow hack here */}
@@ -110,43 +126,82 @@ const DashboardSidebar = () => {
             {dashboardSidebar.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
+              const hasChildren = item.children && item.children.length > 0;
+              const isOpen = openMenus[item.main];
 
               return (
-                <li
-                  key={item.main}
-                  className="relative group"
-                  style={{
-                    paddingRight: collapsed ? "7px" : "10px",
-                    paddingLeft: collapsed ? "7px" : "10px",
-                  }}
-                >
-                  {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 rounded bg-indigo-600"></span>
+               <li key={item.main} className="relative group">
+                  {/* IF HAS NO CHILDREN → NORMAL NAV */}
+                  {!hasChildren && (
+                    <Link
+                      to={item.path}
+                      onMouseEnter={(e) => handleShowTooltip(e, item.main)}
+                      onMouseLeave={handleHideTooltip}
+                      className={`flex items-center rounded-sm text-sm font-medium transition-all
+                        ${isActive ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100"}
+                        ${collapsed ? "justify-center" : "gap-4 px-3 py-2"}
+                      `}
+                    >
+                      <Icon size={21} />
+                      {!collapsed && <span>{item.main}</span>}
+                    </Link>
                   )}
 
-                  <Link
-                    to={item.path}
-                    onMouseEnter={(e) => handleShowTooltip(e, item.main)}
-                    onMouseLeave={handleHideTooltip}
-                    onFocus={(e) => handleShowTooltip(e, item.main)}
-                    onBlur={handleHideTooltip}
-                    style={{
-                      paddingLeft: collapsed ? 0 : "10px",
-                      paddingTop: "8px",
-                      paddingBottom: "8px",
-                    }}
-                    className={`flex items-center gap-4 rounded-sm text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-indigo-100 text-indigo-600"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-indigo-600"
-                    } ${collapsed ? "justify-center" : ""}`}
-                  >
-                    <Icon size={21} className="shrink-0" />
-                    {!collapsed && <span>{item.main}</span>}
-                  </Link>
+                  {/* IF HAS CHILDREN → EXPANDABLE MENU */}
+                  {hasChildren && (
+                    <div
+                      onClick={() => toggleMenu(item.main)}
+                      onMouseEnter={(e) => handleShowTooltip(e, item.main)}
+                      onMouseLeave={handleHideTooltip}
+                      className={`flex items-center cursor-pointer rounded-sm text-sm font-medium transition-all
+                        ${isActive ? "bg-indigo-100 text-indigo-600" : "text-gray-600 hover:bg-gray-100"}
+                        ${collapsed ? "justify-center" : "gap-4 px-3 py-2"}
+                      `}
+                    >
+                      <Icon size={21} />
+                      {!collapsed && <span>{item.main}</span>}
+                      <ChevronRight
+                        size={16}
+                        className={`ml-auto transition-transform ${isOpen ? "rotate-90" : ""}`}
+                      />
+                    </div>
+                  )}
+
+                  {/* CHILDREN */}
+                  {hasChildren && (
+                    <ul
+                      className={`
+                        overflow-hidden transition-all duration-300 ml-10
+                        ${collapsed ? "hidden" : ""}
+                        ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
+                      `}
+                    >
+                      {item.children.map((child) => {
+                        const childActive = location.pathname === child.path;
+                        return (
+                          <li key={child.path}>
+                            <Link
+                              to={child.path}
+                              className={`block text-sm rounded-sm py-2 pl-4 pr-2 transition
+                                ${childActive
+                                  ? "text-indigo-600 font-medium"
+                                  : "text-gray-500 hover:text-indigo-600"
+                                }
+                              `}
+                            >
+                              {child.main}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+
                 </li>
+
               );
             })}
+
           </ul>
         </nav>
       </aside>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import {
@@ -10,9 +10,37 @@ import {
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import ImportDataModal from '@/components/common/ImportDataModal';
-import { useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
+import { getHolidays } from '@/apis';
 
-const HolidaysAndLeaves = ({holidays, setHolidays}) => {
+const HolidaysAndLeaves = () => {
+  const [selectedBranch, setSelectedBranch] = useState(null)
+  const [selectedSite, setSelectedSite] = useState(null)
+  const month = new Date()
+  const year = month.getFullYear();
+  const [holidays, setHolidays] = useState([
+    { id: 1, description: "Republic Day", holiday_date: new Date(2025, 0, 26) },
+    { id: 2, description: "Holi", holiday_date: new Date(2025, 2, 14) },
+  ]);
+
+
+  const { data: holidays1 = [] } = useQuery(
+    [
+      "holidays",
+      {
+        branch_id: selectedBranch ,
+        site_id: selectedSite ,
+        year: year
+      },
+    ],
+    getHolidays,
+    { refetchOnWindowFocus: false }
+  );
+
+  useEffect(() => {
+    setHolidays(holidays1)
+  }, [holidays1])
+
     const queryClient = useQueryClient();
 
     const [showModal, setShowModal] = useState(false);
@@ -30,14 +58,11 @@ const HolidaysAndLeaves = ({holidays, setHolidays}) => {
     };
 
   return (
-    <div>
+    <div className='flex flex-col gap-6'>
     {/*------------------------------------------- Bank Holidays -------------------------------------------*/}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <CalendarDays className="text-blue-500" size={18} />
-            Bank Holidays
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">Holidays</h3>
 
           <div className="flex items-center gap-3">
            <button onClick={() => setShowModal(true)}
