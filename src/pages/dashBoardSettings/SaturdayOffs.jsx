@@ -46,89 +46,86 @@ const SaturdayOffs = ({selectedBranch, selectedSite, year, month, holidays}) => 
 
 
 
-  const { data: getSatOffRule = [] } = useQuery(
-    [
-      "getSatOffRule",
-      {
-        branch_id: null,
-        site_id: null,
-        year: year,
-        month: month.getMonth()
-      }
-    ],
-    getSaturdayOffCustomRule, 
-    { enabled: offRule === "Custom Rule" }
-  );
+    const { data: getSatOffRule = [] } = useQuery(
+        [
+        "getSatOffRule",
+        {
+            branch_id: null,
+            site_id: null,
+            year: year,
+            month: month.getMonth()
+        }
+        ],
+        getSaturdayOffCustomRule, 
+        { enabled: offRule === "Custom Rule" }
+    );
 
 
 
- const handleSave = () => {
-  setCustomSelectedDates([])
-  // Permanent rules
-  if (offRule === "2nd & 4th Saturdays") {
-    setSelectedRule({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      off_saturdays: [2, 4],
-    });
-    return;
-  }
+    const handleSave = () => {
+    setCustomSelectedDates([])
+    // Permanent rules
+    if (offRule === "2nd & 4th Saturdays") {
+        setSelectedRule({
+        branch_id: selectedBranch,
+        site_id: selectedSite,
+        off_saturdays: [2, 4],
+        });
+        return;
+    }
 
-  if (offRule === "All Saturdays") {
-    setSelectedRule({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      off_saturdays: [1, 2, 3, 4, 5],
-    });
-    return;
-  }
+    if (offRule === "All Saturdays") {
+        setSelectedRule({
+        branch_id: selectedBranch,
+        site_id: selectedSite,
+        off_saturdays: [1, 2, 3, 4, 5],
+        });
+        return;
+    }
 
   // Custom: Month-specific
-  if (offRule === "Custom Rule") {
-    const datesToSend = customSelectedDates.map(d =>
-      new Date(d).toISOString().slice(0,10)
-    );
-    
+    if (offRule === "Custom Rule") {
+        const datesToSend = customSelectedDates.map(d =>
+        new Date(d).toISOString().slice(0,10)
+        );
+        
 
-    saveCustomOverrides({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      year,
-      month: month.getMonth(),
-      dates: datesToSend
-    });
-  }
-};
-
-
-useEffect(() => {
-  if (!satOffRule?.rule?.off_saturdays) return;
-
-  const arr = satOffRule.rule.off_saturdays;
-
-  // all sat = [1,2,3,4,5]
-  if (arr.length === 5 && arr.includes(1) && arr.includes(5)) {
-    setOffRule("All Saturdays");
-    return;
-  }
-
-  // 2nd & 4th -----> [2,4]
-  if (arr.length === 2 && arr.includes(2) && arr.includes(4)) {
-    setOffRule("2nd & 4th Saturdays");
-    return;
-  }
-
-  // otherwise-----> custom
-  setOffRule("Custom Rule");
-
-}, [satOffRule]);
+        saveCustomOverrides({
+        branch_id: selectedBranch,
+        site_id: selectedSite,
+        year,
+        month: month.getMonth(),
+        dates: datesToSend
+            });
+        }
+    };
 
 
+    useEffect(() => {
+    if (!satOffRule?.rule?.off_saturdays) return;
 
+    const arr = satOffRule.rule.off_saturdays;
+
+    // all sat = [1,2,3,4,5]
+    if (arr.length === 5 && arr.includes(1) && arr.includes(5)) {
+        setOffRule("All Saturdays");
+        return;
+    }
+
+    // 2nd & 4th -----> [2,4]
+    if (arr.length === 2 && arr.includes(2) && arr.includes(4)) {
+        setOffRule("2nd & 4th Saturdays");
+        return;
+    }
+
+    // otherwise-----> custom
+    setOffRule("Custom Rule");
+
+    }, [satOffRule]);
 
   return (
     <div>
-            {/* 2️⃣ Saturday Off Rule */}
+    {/*  Saturday Off Rule */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800">
           Saturday Off Rule

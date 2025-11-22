@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from "@/components/ui/accordion"
 import { useQuery } from 'react-query';
 import { getHolidays } from '@/apis';
 import HolidaysAndLeaves from './HolidaysAndLeaves';
 import SaturdayOffs from './SaturdayOffs';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
 const Settings = () => {
   const [selectedBranch, setSelectedBranch] = useState(null)
@@ -22,10 +28,12 @@ const Settings = () => {
 
   const accordianItems = [
     {
+      id: "holidaysLeaves",
       component : <HolidaysAndLeaves selectedBranch = {selectedBranch} selectedSite = {selectedSite} year = {year} month = {month} setHolidays = {setHolidays} holidays = {holidays} />,
       label: "Holdidays and Leaves"
     },
     {
+      id: "satOffs",
       component : <SaturdayOffs selectedBranch = {selectedBranch} selectedSite = {selectedSite} year = {year} month = {month} holidays = {holidays} />,
       label: "Saturday Offs"
     }
@@ -53,7 +61,31 @@ const Settings = () => {
   return (
     <div className="px-6 xl:px-8 2xl:px-10 py-6 w-full">
     <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">Settings</h2>
-    <Accordion
+      <Tabs defaultValue="holidaysLeaves" className="w-full mt-10 cursor-pointer">
+        <TabsList className="flex gap-2">
+          {accordianItems.map(item => (
+            <TabsTrigger key={item.id} value={item.id}>
+              {item.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {accordianItems.map(item => (
+          <TabsContent key={item.id} value={item.id} className="mt-4">
+            {item.component}
+          </TabsContent>
+        ))}
+
+      </Tabs>
+    </div>
+  )
+}
+
+export default Settings
+    
+
+
+{/* <Accordion
       type="single"
       collapsible
       className="w-full"
@@ -68,9 +100,4 @@ const Settings = () => {
           </AccordionItem>
         )
       })}
-    </Accordion>
-    </div>
-  )
-}
-
-export default Settings
+    </Accordion> */}
