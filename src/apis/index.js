@@ -57,6 +57,36 @@ export const setSaturdayOffRule = async ({ branch_id, site_id, off_saturdays }) 
   return res.data;
 };
 
+export const getSaturdayRule = async ({ branch_id, site_id }) => {
+  const res = await api.get("/saturdayOffs/rule", {params: { branch_id, site_id }});
+
+  return res.data;
+}
+
+export const setSaturdayOffCustomRule = async ({ branch_id, site_id, year, month, dates }) => {
+  const res = await api.post("/saturdayOffs/rule/custom", {
+    branch_id,
+    site_id,
+    year, 
+    month, 
+    dates
+  });
+  return res.data;
+};
+
+export const getSaturdayOffCustomRule = async ({ queryKey }) => {
+  const [_key, params] = queryKey;
+
+  const { branch_id, site_id, year, month } = params;
+
+  const res = await api.get("/saturdayOffs/rule/custom", {
+    params: { branch_id, site_id, year, month }
+  });
+
+  return res.data;
+};
+
+
 //----------------------leave apis-----------------------
 
 //----------------------employee apis-----------------------

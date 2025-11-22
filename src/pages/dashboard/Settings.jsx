@@ -14,7 +14,7 @@ import SaturdayOffCalendar from "@/components/CustomSaturdaySelector";
 import ImportDataModal from "@/components/common/ImportDataModal";
 import { Checkbox } from "@/components/ui/checkbox"
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { getHolidays, setSaturdayOffRule } from "@/apis";
+import { getHolidays, getSaturdayOffCustomRule, getSaturdayRule, setSaturdayOffCustomRule, setSaturdayOffRule } from "@/apis";
 
 
 const AttendanceSettings = () => {
@@ -22,6 +22,7 @@ const [selectedBranch, setSelectedBranch] = useState(null)
 const [selectedSite, setSelectedSite] = useState(null)
 const month = new Date()
 const year = month.getFullYear();
+const [customSelectedDates, setCustomSelectedDates] = useState([]); 
 
 
 const { data: holidays1 = [] } = useQuery(
@@ -37,6 +38,22 @@ const { data: holidays1 = [] } = useQuery(
   { refetchOnWindowFocus: false }
 );
 
+const {data: satOffRule = [] } = useQuery(
+  [
+    "satOffRule",
+    {
+      branch_id: null ,
+      site_id: null ,
+    }
+  ], 
+  getSaturdayRule,
+ { refetchOnWindowFocus: false }
+)
+
+
+
+console.log(satOffRule.rule, "satOffRule")
+
 const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
   onSuccess: (data) => {
     console.log("Saved:", data);
@@ -47,6 +64,16 @@ const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
     console.error("Failed to save rule");
   }
 });
+
+const { mutate: saveCustomOverrides } = useMutation(
+  setSaturdayOffCustomRule,
+  {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["satOffRule"]);
+      // toast.success("Custom Saturday OFF saved");
+    }
+  }
+);
 
   const [showModal, setShowModal] = useState(false);
   const queryClient = useQueryClient();
@@ -64,6 +91,22 @@ const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
     carryForward: true,
   });
 
+  const { data: getSatOffRule = [] } = useQuery(
+    [
+      "getSatOffRule",
+      {
+        branch_id: null,
+        site_id: null,
+        year: year,
+        month: month.getMonth()
+      }
+    ],
+    getSaturdayOffCustomRule, 
+    { enabled: offRule === "Custom Rule" }
+  );
+
+console.log(getSatOffRule, "getSatOffRule")
+
   const handleAddHoliday = () => {
     setHolidays([...holidays, { id: Date.now(), description: "", holiday_date: new Date() }]);
   };
@@ -71,13 +114,15 @@ const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
     setHolidays(holidays.filter((h) => h.id !== id));
   };
 
-  const handleSave = () => {
+ const handleSave = () => {
+  // Permanent rules
   if (offRule === "2nd & 4th Saturdays") {
     setSelectedRule({
       branch_id: selectedBranch,
       site_id: selectedSite,
       off_saturdays: [2, 4],
     });
+    return;
   }
 
   if (offRule === "All Saturdays") {
@@ -86,16 +131,47 @@ const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
       site_id: selectedSite,
       off_saturdays: [1, 2, 3, 4, 5],
     });
+    return;
   }
 
-  // if (offRule === "Custom Rule") {
-  //   setSelectedRule({
-  //     branch_id: selectedBranch,
-  //     site_id: selectedSite,
-  //     off_saturdays: customSelectedSaturdays, // array from your custom UI
-  //   });
-  // }
+  // Custom: Month-specific
+  if (offRule === "Custom Rule") {
+    const datesToSend = customSelectedDates.map(d =>
+      new Date(d).toISOString().slice(0,10)
+    );
+
+    saveCustomOverrides({
+      branch_id: selectedBranch,
+      site_id: selectedSite,
+      year,
+      month: month.getMonth(),
+      dates: datesToSend
+    });
+  }
 };
+
+
+useEffect(() => {
+  if (!satOffRule?.rule?.off_saturdays) return;
+
+  const arr = satOffRule.rule.off_saturdays;
+
+  // all sat = [1,2,3,4,5]
+  if (arr.length === 5 && arr.includes(1) && arr.includes(5)) {
+    setOffRule("All Saturdays");
+    return;
+  }
+
+  // 2nd & 4th -----> [2,4]
+  if (arr.length === 2 && arr.includes(2) && arr.includes(4)) {
+    setOffRule("2nd & 4th Saturdays");
+    return;
+  }
+
+  // otherwise-----> custom
+  setOffRule("Custom Rule");
+
+}, [satOffRule]);
 
 
   useEffect(() => {
@@ -236,7 +312,7 @@ const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
         </div>
 
         {/* Custom Saturdays Calendar */}
-        {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}/>}
+        {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}  setCustomSelectedDates={(dates) => setCustomSelectedDates(dates)} getSatOffRule={getSatOffRule} />}
 
       </div>
 
