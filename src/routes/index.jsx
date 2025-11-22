@@ -9,7 +9,7 @@ import OrgSetup from '@/pages/dashboard/OrgSetup';
 import PayrollManagement from '@/pages/dashboard/PayrollManagement';
 import PoliciesManagement from '@/pages/dashboard/PoliciesManagement';
 import RoleManagement from '@/pages/dashboard/RoleManagement';
-import Settings from '@/pages/dashboard/Settings';
+import Settings from '@/pages/dashBoardSettings/Settings';
 import Login from '@/pages/Login';
 import NotFound from '@/pages/NotFound';
 

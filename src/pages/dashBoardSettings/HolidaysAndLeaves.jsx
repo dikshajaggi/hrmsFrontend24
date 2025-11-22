@@ -1,196 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react'
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
 import {
   Plus,
   Trash2,
   CalendarDays,
   Upload,
-  Settings,
   Save,
-  RefreshCcw,
 } from "lucide-react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import SaturdayOffCalendar from "@/components/CustomSaturdaySelector";
-import ImportDataModal from "@/components/common/ImportDataModal";
 import { Checkbox } from "@/components/ui/checkbox"
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { getHolidays, getSaturdayOffCustomRule, getSaturdayRule, setSaturdayOffCustomRule, setSaturdayOffRule } from "@/apis";
+import ImportDataModal from '@/components/common/ImportDataModal';
+import { useQueryClient } from 'react-query';
 
+const HolidaysAndLeaves = ({holidays, setHolidays}) => {
+    const queryClient = useQueryClient();
 
-const AttendanceSettings = () => {
-const [selectedBranch, setSelectedBranch] = useState(null)
-const [selectedSite, setSelectedSite] = useState(null)
-const month = new Date()
-const year = month.getFullYear();
-const [customSelectedDates, setCustomSelectedDates] = useState([]); 
-
-
-const { data: holidays1 = [] } = useQuery(
-  [
-    "holidays",
-    {
-      branch_id: null ,
-      site_id: null ,
-      year: year
-    },
-  ],
-  getHolidays,
-  { refetchOnWindowFocus: false }
-);
-
-const {data: satOffRule = [] } = useQuery(
-  [
-    "satOffRule",
-    {
-      branch_id: null ,
-      site_id: null ,
-    }
-  ], 
-  getSaturdayRule,
- { refetchOnWindowFocus: false }
-)
-
-
-
-console.log(satOffRule.rule, "satOffRule")
-
-const { mutate: setSelectedRule } = useMutation(setSaturdayOffRule, {
-  onSuccess: (data) => {
-    console.log("Saved:", data);
-    // toast.success("Saturday rule saved!");
-  },
-  onError: () => {
-    // toast.error("Failed to save rule");
-    console.error("Failed to save rule");
-  }
-});
-
-const { mutate: saveCustomOverrides } = useMutation(
-  setSaturdayOffCustomRule,
-  {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["satOffRule"]);
-      // toast.success("Custom Saturday OFF saved");
-    }
-  }
-);
-
-  const [showModal, setShowModal] = useState(false);
-  const queryClient = useQueryClient();
-
-  const [holidays, setHolidays] = useState([
-    { id: 1, description: "Republic Day", holiday_date: new Date(2025, 0, 26) },
-    { id: 2, description: "Holi", holiday_date: new Date(2025, 2, 14) },
-  ]);
-
-  const [offRule, setOffRule] = useState(null);
-
-  const [leavePolicy, setLeavePolicy] = useState({
+    const [showModal, setShowModal] = useState(false);
+    const [leavePolicy, setLeavePolicy] = useState({
     casual: 1,
     sick: 1,
     carryForward: true,
-  });
-
-  const { data: getSatOffRule = [] } = useQuery(
-    [
-      "getSatOffRule",
-      {
-        branch_id: null,
-        site_id: null,
-        year: year,
-        month: month.getMonth()
-      }
-    ],
-    getSaturdayOffCustomRule, 
-    { enabled: offRule === "Custom Rule" }
-  );
-
-console.log(getSatOffRule, "getSatOffRule")
-
-  const handleAddHoliday = () => {
-    setHolidays([...holidays, { id: Date.now(), description: "", holiday_date: new Date() }]);
-  };
-  const handleDeleteHoliday = (id) => {
-    setHolidays(holidays.filter((h) => h.id !== id));
-  };
-
- const handleSave = () => {
-  // Permanent rules
-  if (offRule === "2nd & 4th Saturdays") {
-    setSelectedRule({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      off_saturdays: [2, 4],
     });
-    return;
-  }
 
-  if (offRule === "All Saturdays") {
-    setSelectedRule({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      off_saturdays: [1, 2, 3, 4, 5],
-    });
-    return;
-  }
-
-  // Custom: Month-specific
-  if (offRule === "Custom Rule") {
-    const datesToSend = customSelectedDates.map(d =>
-      new Date(d).toISOString().slice(0,10)
-    );
-
-    saveCustomOverrides({
-      branch_id: selectedBranch,
-      site_id: selectedSite,
-      year,
-      month: month.getMonth(),
-      dates: datesToSend
-    });
-  }
-};
-
-
-useEffect(() => {
-  if (!satOffRule?.rule?.off_saturdays) return;
-
-  const arr = satOffRule.rule.off_saturdays;
-
-  // all sat = [1,2,3,4,5]
-  if (arr.length === 5 && arr.includes(1) && arr.includes(5)) {
-    setOffRule("All Saturdays");
-    return;
-  }
-
-  // 2nd & 4th -----> [2,4]
-  if (arr.length === 2 && arr.includes(2) && arr.includes(4)) {
-    setOffRule("2nd & 4th Saturdays");
-    return;
-  }
-
-  // otherwise-----> custom
-  setOffRule("Custom Rule");
-
-}, [satOffRule]);
-
-
-  useEffect(() => {
-    setHolidays(holidays1)
-  }, [holidays1])
+    const handleAddHoliday = () => {
+        setHolidays([...holidays, { id: Date.now(), description: "", holiday_date: new Date() }]);
+    };
+    const handleDeleteHoliday = (id) => {
+        setHolidays(holidays.filter((h) => h.id !== id));
+    };
 
   return (
-    <div className="space-y-8 w-full">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
-        Attendance Settings
-        </h2>
-        <button className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-          <RefreshCcw size={16} /> Sync Changes
-        </button>
-      </div>
-
-      {/* 1️⃣ Bank Holidays */}
+    <div>
+    {/* 1️⃣ Bank Holidays */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -278,45 +119,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* 2️⃣ Saturday Off Rule */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Saturday Off Rule
-        </h3>
-        <button onClick={handleSave} >Save Changes</button>
-        <p className="text-xs mb-4 text-gray-500">*This will be applied to all the months except the <b>custom rule</b></p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          {[
-            "All Saturdays",
-            "2nd & 4th Saturdays",
-            "Custom Rule",
-          ].map((rule) => (
-            <label
-              key={rule}
-              className={`border rounded-lg px-4 py-2 cursor-pointer transition ${
-                offRule === rule
-                  ? "border-blue-500 bg-blue-50 text-blue-700"
-                  : "border-gray-200 hover:bg-gray-50"
-              }`}
-            >
-              <input
-                type="radio"
-                value={rule}
-                checked={offRule === rule}
-                onChange={() => setOffRule(rule)}
-                className="hidden"
-              />
-              {rule}
-            </label>
-          ))}
-        </div>
-
-        {/* Custom Saturdays Calendar */}
-        {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}  setCustomSelectedDates={(dates) => setCustomSelectedDates(dates)} getSatOffRule={getSatOffRule} />}
-
-      </div>
-
-      {/* 3️⃣ Leave Policy */}
+            {/* 3️⃣ Leave Policy */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Monthly Leave Policy
@@ -378,7 +181,7 @@ useEffect(() => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AttendanceSettings;
+export default HolidaysAndLeaves
