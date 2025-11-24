@@ -7,22 +7,22 @@ const QuickLinks = () => {
     const links = [
         {
             title: "View Monthly Attendance Report",
-            link: "#",
+            link: "/dashboard/attendance-management",
             icon: FileSliders
         }, 
         {
             title: "Update Company Holidays",
-            link: "#",
+            link: "/dashboard/settings/holiday-leave-policies",
             icon: Tent
         }, 
         {
             title: "Manage Branches / Departments",
-            link: "#",
+            link: "/dashboard/org-management",
             icon: FolderKanban
         }, 
         {
             title: "View All Payslips",
-            link: "#",
+            link: "/dashboard/payroll",
             icon: Banknote
         }
     ]

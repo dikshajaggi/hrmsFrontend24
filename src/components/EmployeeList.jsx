@@ -33,16 +33,16 @@ const EmployeeList = () => {
     );
 
     const { data: departments = [] } = useQuery(
-    ["departments"],
-    getDepartments,
-    { refetchOnWindowFocus: false }
-  );
+      ["departments"],
+      getDepartments,
+      { refetchOnWindowFocus: false }
+    );
 
-  const { data: sites = [] } = useQuery(
-    ["projectSites"],
-    getProjectSites,
-    { refetchOnWindowFocus: false }
-  );
+    const { data: sites = [] } = useQuery(
+      ["projectSites"],
+      getProjectSites,
+      { refetchOnWindowFocus: false }
+    );
 
   // const employees = [
   //   {

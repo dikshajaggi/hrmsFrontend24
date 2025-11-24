@@ -9,11 +9,39 @@ import {
   Badge,
 } from "lucide-react";
 import ImportDataModal from "@/components/common/ImportDataModal";
+import { getBranches, getDepartments, getDesignations, getProjectSites } from "@/apis";
+import { useQuery } from "react-query";
 
 const OrgSetup = () => {
     
     const [activeTab, setActiveTab] = useState("branches");
     const [showModal, setShowModal] = useState(false);
+
+    const { data: branches = [] } = useQuery(
+      ["branches"],
+      getBranches,
+      { refetchOnWindowFocus: false }
+    );
+
+    const { data: departments = [] } = useQuery(
+      ["departments"],
+      getDepartments,
+      { refetchOnWindowFocus: false }
+    );
+
+    const { data: sites = [] } = useQuery(
+      ["projectSites"],
+      getProjectSites,
+      { refetchOnWindowFocus: false }
+    );
+
+    const { data: designation = [] } = useQuery(
+      ["designation"],
+      getDesignations,
+      { refetchOnWindowFocus: false }
+    );
+
+    console.log(branches, departments, sites, designation, "sites")
 
     const tabs = [
         { id: "branches", label: "Branches", icon: <Building2 size={16} /> },

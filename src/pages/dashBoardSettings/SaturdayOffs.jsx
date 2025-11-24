@@ -153,13 +153,15 @@ const SaturdayOffs = () => {
     }, [satOffRule]);
 
   return (
-    <div>
+    <>
     {/*  Saturday Off Rule */}
       <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Saturday Off Rule
-        </h3>
-        <button onClick={handleSave} >Save Changes</button>
+        <div className='w-full flex items-center justify-between'>        
+          <h3 className="text-lg font-semibold text-gray-800">
+            Saturday Off Rule
+          </h3>
+          <button onClick={handleSave} className="flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">Save Changes</button>
+        </div>
         <p className="text-xs mb-4 text-gray-500">*This will be applied to all the months except the <b>custom rule</b></p>
         <div className="flex flex-col sm:flex-row gap-4">
           {[
@@ -191,7 +193,7 @@ const SaturdayOffs = () => {
         {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}  setCustomSelectedDates={(dates) => setCustomSelectedDates(dates)} getSatOffRule={getSatOffRule} />}
 
       </div>
-    </div>
+    </>
   )
 }
 

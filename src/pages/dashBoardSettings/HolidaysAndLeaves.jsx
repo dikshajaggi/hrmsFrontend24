@@ -58,7 +58,10 @@ const HolidaysAndLeaves = () => {
     };
 
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex flex-col gap-6 p-6'>
+      <h3 className="text-lg font-semibold text-gray-800">
+        Role & Accesss
+      </h3>
     {/*------------------------------------------- Bank Holidays -------------------------------------------*/}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex justify-between items-center mb-4">

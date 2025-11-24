@@ -26,6 +26,12 @@ export const getDepartments = async () => {
   return res.data.data;
 }
 
+//----------------------designation apis-----------------------
+export const getDesignations = async () => {
+ const res = await api.get("/designation");
+  return res.data.data;
+}
+
 //----------------------holiday and saturday off apis-----------------------
 export const getHolidays = async ({ queryKey }) => {
   const [_key, { branch_id, site_id, year }] = queryKey;

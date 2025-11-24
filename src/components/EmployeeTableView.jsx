@@ -8,6 +8,14 @@ import {
 import ExportDataModal from "./common/ExportDataModal";
 import { Search, User, Building2, MapPin, Briefcase, Users } from "lucide-react";
 import SearchExportData from "./SearchExportData";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+
 
 const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [globalFilter, setGlobalFilter] = useState("");
@@ -18,6 +26,37 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
   // 🔹 Define columns with icons where appropriate
   const columns = useMemo(
     () => [
+        {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          className="cursor-pointer"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          className="cursor-pointer"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+        />
+      ),
+      size: 50,
+    },
+
+    // ============================
+    // 2️⃣ Serial Number Column
+    // ============================
+    {
+      id: "sno",
+      header: "S.No",
+      cell: ({ row }) => row.index + 1,
+      size: 60,
+    },
+
       {
         accessorKey: "id",
         header: () => (
@@ -86,6 +125,42 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
         header: "Gender",
         size: 100,
       },
+      {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+          const employee = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 rounded hover:bg-gray-100">
+                  <MoreVertical size={18} className="text-gray-600" />
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem
+                  onClick={() => console.log("Edit", employee)}
+                  className="cursor-pointer"
+                >
+                  <Pencil size={14} className="mr-2" />
+                  Edit
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => console.log("Delete", employee)}
+                  className="cursor-pointer text-red-600 focus:text-red-600"
+                >
+                  <Trash size={14} className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+        size: 80,
+      },
     ],
     []
   );
@@ -98,6 +173,7 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
     globalFilterFn: "includesString",
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    enableRowSelection: true,
   });
 
   return (
