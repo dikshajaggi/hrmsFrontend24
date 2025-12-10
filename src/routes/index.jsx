@@ -18,6 +18,7 @@ import NotFound from '@/pages/NotFound';
 import { 
   createBrowserRouter, 
 } from 'react-router-dom';
+import AssetManagement from '@/pages/dashboard/AssetManagement';
 
 // Define routes as objects
 const router = createBrowserRouter([
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
           { path: "policies", element: <PoliciesManagement /> },
           { path: "payroll", element: <PayrollManagement /> },
           { path: "org-management", element: <OrgSetup />},
+          { path: "asset-management", element: <AssetManagement />},
           {
             path: "settings",
             element: <SettingsLayout />, 

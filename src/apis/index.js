@@ -1,3 +1,4 @@
+import { getMockAttendanceGrid } from "@/components/attendanceMockData";
 import api from "./axiosInstance";
 
 
@@ -91,6 +92,60 @@ export const getSaturdayOffCustomRule = async ({ queryKey }) => {
 
   return res.data;
 };
+
+
+//----------------------attendance apis------------------
+
+
+export async function fetchAttendanceGrid1(
+  branchId,
+  siteId,
+  month,
+  year,
+  page,
+  pageSize
+) {
+  const params = {branchId, siteId, month, year, page, pageSize}
+  const { data } = await api.get('/attendance/grid', {
+    params,
+  });
+  return data;
+}
+
+export async function saveAttendanceBulk(month, year, updates) {
+  const body = {month,  year, updates}
+  const { data } = await api.post('/attendance/bulk-upsert', body);
+  return data;
+}
+
+const USE_MOCK = true;
+
+
+export async function fetchAttendanceGrid(
+  {month,
+  year,
+  page,
+  pageSize}
+) {
+  const params = {month,
+  year,
+  page,
+  pageSize}
+
+  if (USE_MOCK) {
+    console.log(page, pageSize, "pageee")
+    return getMockAttendanceGrid(params.page, params.pageSize, params.year, params.month);
+  }
+  return fetchAttendanceGrid1(params);
+}
+
+// export async function saveAttendanceBulk(data) {
+//   if (USE_MOCK) {
+//     return mockSaveAttendanceBulk1(data);
+//   }
+//   return realSave(data);
+// }
+
 
 
 //----------------------leave apis-----------------------

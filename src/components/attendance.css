@@ -1,0 +1,381 @@
+/* src/styles/attendance.css */
+
+.attendance-page {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.attendance-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.attendance-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attendance-month-nav button {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
+.attendance-month-nav button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.attendance-month-label {
+  font-weight: 600;
+}
+
+.attendance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  background: #f5f7fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+.attendance-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.attendance-page-actions button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.attendance-page-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.unsaved-indicator {
+  font-size: 0.8rem;
+  color: #b91c1c;
+}
+
+.attendance-error {
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+/* TABLE WRAPPER */
+
+.attendance-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  max-height: 70vh; /* scroll vertically on small screens */
+  position: relative;
+}
+
+.attendance-loading {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+/* TABLE */
+
+.attendance-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-size: 0.8rem;
+}
+
+.attendance-table th,
+.attendance-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.3rem 0.4rem;
+  white-space: nowrap;
+  /* background: white; */
+}
+
+/* Sticky columns / headers */
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #f3f4f6;
+}
+
+.sticky-top-2 {
+  position: sticky;
+  top: 1.7rem; /* height of first header row */
+  z-index: 5;
+  background: #f9fafb;
+}
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  background: #f9fafb;
+}
+
+.header-name-col {
+  min-width: 160px;
+}
+
+.header-desig-col {
+  min-width: 140px;
+  left: 160px; /* width of first sticky col */
+}
+
+.header-desig-col.sticky-top,
+.header-desig-col.sticky-top-2,
+.header-desig-col.employee-cell {
+  left: 160px;
+}
+
+/* Date / day headers */
+
+.date-header-cell,
+.day-header-cell {
+  text-align: center;
+  font-weight: 600;
+  padding: 0.25rem 0.4rem;
+}
+
+.summary-header {
+  text-align: center;
+  font-weight: 600;
+  min-width: 60px;
+}
+
+/* Employee name cells */
+
+.employee-cell {
+  background: #f9fafb;
+  font-weight: 500;
+}
+
+/* Summary cells */
+
+.summary-cell {
+  text-align: center;
+  font-weight: 600;
+  background: #f3f4f6;
+}
+
+/* Attendance cells */
+
+.attendance-cell {
+  position: relative;
+  cursor: pointer;
+  text-align: center;
+  height: 32px;
+  min-width: 32px;
+}
+
+.attendance-cell-display {
+  font-weight: 600;
+}
+
+.cell-holiday {
+  background: #fef3c7;
+}
+
+.cell-saturday {
+  background: #e5e7eb;
+}
+
+.cell-locked {
+  cursor: default;
+}
+
+.cell-open {
+  background: #e0f2fe;
+}
+
+/* Dropdown */
+
+.attendance-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+  z-index: 20;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.attendance-dropdown-item {
+  padding: 0.25rem 0.4rem;
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.attendance-dropdown-item:hover {
+  background: #eff6ff;
+}
+
+.attendance-dropdown-item .code {
+  width: 32px;
+  font-weight: 600;
+}
+
+.attendance-dropdown-item .label {
+  font-size: 0.8rem;
+}
+
+/* Tooltip for holiday description */
+
+.attendance-cell-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translateY(-2px);
+  background: #111827;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+  white-space: nowrap;
+  z-index: 15;
+}
+
+/* Pagination */
+
+.attendance-pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.attendance-pagination button {
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  cursor: pointer;
+}
+
+.attendance-pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 768px) {
+  .attendance-page-header h2 {
+    font-size: 1rem;
+  }
+
+  .attendance-legend span {
+    font-size: 0.7rem;
+  }
+
+  .attendance-table-wrapper {
+    max-height: 60vh;
+  }
+}
+
+
+/* ================= COLORS ================= */
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: #f7f7f7;
+}
+
+.legend-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid black;
+}
+
+
+.cell-present {
+  background-color: #ffffff; 
+  color: #000000;
+}
+
+/* 🔴 Sundays / Saturday offs */
+.cell-weekend {
+  background-color: #f6b5b5; /* light red */
+  color: #7f1d1d;
+}
+
+/* 🟣 Holidays */
+.cell-holiday {
+  background-color: #e9d5ff; /* light purple */
+  color: #581c87;
+  position: relative;
+}
+
+/* 🟢 Casual Leaves */
+.cell-leave {
+  background-color: #9bfdbd; /* green */
+  color: #14532d;
+}
+
+/* 🔵 Sick Leaves */
+.cell-sick {
+  background-color: #aedfff; /* light blue */
+  color: #075985;
+}
+
+/* 🟡 WFH */
+.cell-wfh {
+  background-color: #fef9c3; /* yellow */
+  color: #efde5e;
+}
+
+/* 🟡 WFH */
+.cell-compoff {
+  background-color: #eb9afe; /* yellow */
+  color: #9a2192;
+}
+
+
+/* Locked cells cursor */
+.cell-weekend,
+.cell-holiday {
+  cursor: not-allowed;
+}

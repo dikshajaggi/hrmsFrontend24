@@ -1,4 +1,4 @@
-import { Home, Users, Calendar, Building2, Settings, FolderClosed, IndianRupee, SquareChartGantt, UserStar} from 'lucide-react';
+import { Home, Users, Calendar, Building2, Settings, FolderClosed, IndianRupee, SquareChartGantt, UserStar, MonitorSmartphone} from 'lucide-react';
 
 
 export const dashboardSidebar = [
@@ -8,6 +8,7 @@ export const dashboardSidebar = [
     {main: "Payroll & Reimbursements", path: "/dashboard/payroll", icon: IndianRupee},
     // {main: "Holiday & Events", path: "/dashboard/holiday-management", icon: Calendar},
     {main: "Organisation Setup", path: "/dashboard/org-management", icon: Building2},
+    {main: "Asset Management", path: "/dashboard/asset-management", icon: MonitorSmartphone},
     {main: "Documents & Policies", path: "/dashboard/policies", icon: FolderClosed},
       {
         main: "Settings",

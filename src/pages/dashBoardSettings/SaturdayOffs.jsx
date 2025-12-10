@@ -1,7 +1,76 @@
 import { getHolidays, getSaturdayOffCustomRule, getSaturdayRule, setSaturdayOffCustomRule, setSaturdayOffRule } from '@/apis';
 import SaturdayOffCalendar from '@/components/CustomSaturdaySelector';
+import SaturdayMonthlySummary from '@/components/SaturdayMonthlySummary';
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+
+const saturdaySummary = [
+  {
+    month: "January 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Jan 2025", "25 Jan 2025"]
+  },
+  {
+    month: "February 2025",
+    rule: "Custom Rule",
+    dates: ["08 Feb 2025", "29 Feb 2025"]
+  },
+   {
+    month: "March 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Mar 2025", "25 Mar 2025"]
+  },
+  {
+    month: "April 2025",
+    rule: "Custom Rule",
+    dates: ["08 Apr 2025", "29 Apr 2025"]
+  },
+   {
+    month: "May 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 May 2025", "25 May 2025"]
+  },
+  {
+    month: "June 2025",
+    rule: "Custom Rule",
+    dates: ["08 Jun 2025", "29 Jun 2025"]
+  },
+   {
+    month: "July 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Jul 2025", "25 Jul 2025"]
+  },
+   {
+    month: "August 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Aug 2025", "25 Aug 2025"]
+  },
+   {
+    month: "September 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Sept 2025", "25 Sept 2025"]
+  },
+  {
+    month: "October 2025",
+    rule: "2nd & 4th Saturdays",
+    dates: ["11 Oct 2025", "25 Oct 2025"]
+  },
+  {
+    month: "November 2025",
+    rule: "Custom Rule",
+    dates: ["08 Nov 2025", "29 Nov 2025"]
+  },
+  {
+    month: "December 2025",
+    rule: "Custom Rule",
+    dates: ["13 Dec 2025", "27 Dec 2025"]
+  },
+  {
+    month: "January 2026",
+    rule: "2nd & 4th Saturdays",
+    dates: ["10 Jan 2026", "24 Jan 2026"]
+  }
+];
 
 
 const SaturdayOffs = () => {
@@ -191,6 +260,7 @@ const SaturdayOffs = () => {
 
         {/* Custom Saturdays Calendar */}
         {offRule === "Custom Rule" && <SaturdayOffCalendar bankHolidays={holidays.map((h) => h.holiday_date)}  setCustomSelectedDates={(dates) => setCustomSelectedDates(dates)} getSatOffRule={getSatOffRule} />}
+        <SaturdayMonthlySummary summary={saturdaySummary} />
 
       </div>
     </>

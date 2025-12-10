@@ -6,7 +6,6 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import ExportDataModal from "./common/ExportDataModal";
-import { Search, User, Building2, MapPin, Briefcase, Users } from "lucide-react";
 import SearchExportData from "./SearchExportData";
 import { MoreVertical, Pencil, Trash } from "lucide-react";
 import {

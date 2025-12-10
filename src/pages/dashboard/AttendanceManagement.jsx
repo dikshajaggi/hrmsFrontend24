@@ -1,4 +1,4 @@
-import AttendanceTable from '@/components/AttendanceTable'
+import { AttendancePage } from '@/components/AttendancePage'
 import {BranchSelect, ProjectSiteSelect} from '@/components/BranchProjectSiteSelect'
 import DashboardCards from '@/components/DashboardCards'
 import React, { useState } from 'react'
@@ -31,7 +31,10 @@ const AttendanceManagement = () => {
           </div>
         </div>
       <div className="grid grid-cols-1 overflow-auto mt-2">
-        <AttendanceTable filters={filters} setFilters={setFilters} />
+        <AttendancePage  
+          selectedBranch={selectedBranch}
+          selectedSite={selectedSite}
+        />
       </div>
     </div>
   )
