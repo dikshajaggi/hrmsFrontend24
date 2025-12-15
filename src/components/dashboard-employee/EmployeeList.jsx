@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import EmployeeTableView from "./EmployeeTableView";
 import EmployeeCardView from "./EmployeeCardView";
 import { LayoutGrid, LayoutList } from "lucide-react";
-import ModernSelect from "./common/ModernSelect";
+import ModernSelect from "../common/ModernSelect";
 import { getBranches, getDepartments, getEmployees, getProjectSites } from "@/apis";
 import { useQuery } from "react-query";
 
@@ -223,7 +223,7 @@ const EmployeeList = () => {
       </div>
 
       {/* Filters */}
-      <div className="border border-gray-100 bg-white rounded-xl p-3 mb-6 shadow-sm">
+      <div className="flex flex-col gap-2 border border-gray-100 bg-white rounded-xl p-3 mb-6 shadow-sm">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Branch */}
           <div className="relative group">
@@ -256,15 +256,22 @@ const EmployeeList = () => {
           </div>
 
           {/* Gender */}
-          <div className="relative group">
-             <ModernSelect
+          <div className="frelative group">
+            <ModernSelect
               label="Gender"
               options={["All", "Male", "Female"]}
               value={filters.gender}
               onChange={(val) => setFilters({ ...filters, gender: val })}
             />
-          </div>
-          <div className="" onClick={resetFilters}>Reset</div>
+            </div>
+        </div>
+        <div className="flex items-center gap-1 ml-auto">
+          <button
+            onClick={resetFilters}
+            className="w-[100px] flex justify-center items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-pointer"
+            >
+            Reset
+          </button>
         </div>
       </div>
 

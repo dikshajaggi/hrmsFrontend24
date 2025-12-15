@@ -68,14 +68,14 @@ const DashboardHeader = () => {
 
           {/* Light/Dark Mode Toggle */}
           <button
-            className='relative text-gray-600 hover:text-gray-800 cursor-pointer'
-            onClick={toggleDarkMode}
+            className='relative text-gray-600 hover:text-gray-800 cursor-not-allowed'
+            // onClick={toggleDarkMode}
           >
             {isDarkMode ? <Moon /> : <Sun />}
           </button>
 
           {/* Notifications */}
-          <button className="relative text-gray-600 hover:text-gray-800 cursor-pointer">
+          <button className="relative text-gray-600 hover:text-gray-800 cursor-not-allowed">
             <Bell size={20} />
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500"></span>
           </button>

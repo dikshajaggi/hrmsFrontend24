@@ -1,7 +1,7 @@
 // src/components/attendance/AttendanceGrid.tsx
 import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { AttendanceCell } from './AttendanceCell';
-import { useClickOutside } from '../hooks/useClickOutside';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import "./attendance.css"
 
 function getLeaveValue(status)  {

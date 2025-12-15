@@ -1,5 +1,5 @@
-import { AttendancePage } from '@/components/AttendancePage'
 import {BranchSelect, ProjectSiteSelect} from '@/components/BranchProjectSiteSelect'
+import { AttendancePage } from '@/components/dashboard-attendance/AttendancePage';
 import DashboardCards from '@/components/DashboardCards'
 import React, { useState } from 'react'
 
@@ -30,13 +30,13 @@ const AttendanceManagement = () => {
             <div><ProjectSiteSelect selectedSite={selectedSite} setSelectedSite={setSelectedSite} /></div>
           </div>
         </div>
-      <div className="grid grid-cols-1 overflow-auto mt-2">
+      <div className="grid grid-cols-1 overflow-auto mt-2 shadow-md bg-white rounded-2xl">
         <AttendancePage  
           selectedBranch={selectedBranch}
           selectedSite={selectedSite}
         />
       </div>
-    </div>
+    </div> 
   )
 }
 

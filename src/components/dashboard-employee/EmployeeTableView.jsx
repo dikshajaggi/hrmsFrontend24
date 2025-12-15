@@ -5,46 +5,57 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import ExportDataModal from "./common/ExportDataModal";
-import SearchExportData from "./SearchExportData";
-import { MoreVertical, Pencil, Trash } from "lucide-react";
+import ExportDataModal from "../common/ExportDataModal";
+import SearchExportData from "../SearchExportData";
+import { MoreVertical, Pencil, Trash, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { WarningModal } from "../common/WarningModal";
+import { Drawer } from "../common/Drawer";
 
 
 const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showEdit, setShowEdit] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  
 
   const data = useMemo(() => employees, [employees]);
+
+  const handleDelete = () => {
+
+  }
 
   // 🔹 Define columns with icons where appropriate
   const columns = useMemo(
     () => [
-        {
-      id: "select",
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          className="cursor-pointer"
-          checked={table.getIsAllPageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-        />
-      ),
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          className="cursor-pointer"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-        />
-      ),
-      size: 50,
-    },
+    //     {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <input
+    //       type="checkbox"
+    //       className="cursor-pointer"
+    //       checked={table.getIsAllPageRowsSelected()}
+    //       onChange={table.getToggleAllPageRowsSelectedHandler()}
+    //     />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <input
+    //       type="checkbox"
+    //       className="cursor-pointer"
+    //       checked={row.getIsSelected()}
+    //       onChange={row.getToggleSelectedHandler()}
+    //     />
+    //   ),
+    //   size: 50,
+    // },
 
     // ============================
     // 2️⃣ Serial Number Column
@@ -76,11 +87,11 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
         ),
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <img
+           {row.original.image ? <img
               src={row.original.image || "https://via.placeholder.com/40"}
               alt={row.original.name}
               className="w-8 h-8 rounded-full object-cover border border-gray-200"
-            />
+            /> : <User />}
             <span className="font-medium text-gray-800">{row.original.name}</span>
           </div>
         ),
@@ -140,15 +151,23 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
 
               <DropdownMenuContent align="end" className="w-32">
                 <DropdownMenuItem
-                  onClick={() => console.log("Edit", employee)}
-                  className="cursor-pointer"
+                  onClick={() => setShowEdit(true)}
+                  className="cursor-pointer text-blue-600 focus:text-blue-700"
                 >
                   <Pencil size={14} className="mr-2" />
                   Edit
                 </DropdownMenuItem>
 
+                 <DropdownMenuItem
+                  onClick={() => setSelectedEmployee(employee)}
+                  className="cursor-pointer text-blue-600 focus:text-blue-700"
+                >
+                  <Trash size={14} className="mr-2" />
+                  View Details
+                </DropdownMenuItem>
+
                 <DropdownMenuItem
-                  onClick={() => console.log("Delete", employee)}
+                  onClick={() => setOpen(true)}
                   className="cursor-pointer text-red-600 focus:text-red-600"
                 >
                   <Trash size={14} className="mr-2" />
@@ -224,7 +243,7 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className="border-b border-gray-100 hover:bg-gray-50 transition"
+                className="border-b border-gray-100 hover:bg-gray-50 transition capitalize"
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
@@ -261,6 +280,36 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
           Next
         </button>
       </div>
+      <WarningModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={handleDelete}
+        employeeName="Rahul Sharma"
+        loading={loading}
+      />
+      <Drawer
+        isOpen={showEdit}
+        onClose={() => setShowEdit(false)}
+        title="Edit Employee"
+        subtitle="Quick updates"
+      >
+        {/* <EditEmployeeForm employee={selectedEmployee} /> */}
+      </Drawer>
+
+       <Drawer
+          isOpen={!!selectedEmployee}
+          onClose={() => setSelectedEmployee(null)}
+          title={selectedEmployee?.name}
+          subtitle={selectedEmployee?.designation?.designation_name}
+          headerActions={
+            <button className="text-sm text-blue-600 font-medium">
+              Full Profile →
+            </button>
+          }
+        >
+          {/* Employee summary / tabs */}
+        </Drawer>
+
     </div>
   );
 };

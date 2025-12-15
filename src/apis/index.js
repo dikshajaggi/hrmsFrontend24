@@ -1,4 +1,4 @@
-import { getMockAttendanceGrid } from "@/components/attendanceMockData";
+import { getMockAttendanceGrid } from "@/components/dashboard-attendance/attendanceMockData";
 import api from "./axiosInstance";
 
 

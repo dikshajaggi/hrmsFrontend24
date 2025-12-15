@@ -19,6 +19,7 @@ import {
   createBrowserRouter, 
 } from 'react-router-dom';
 import AssetManagement from '@/pages/dashboard/AssetManagement';
+import Profile from '@/pages/Profile';
 
 // Define routes as objects
 const router = createBrowserRouter([
@@ -62,6 +63,9 @@ const router = createBrowserRouter([
               { path: "roles", element: <RoleManagement /> },
             ]
           },
+          // employee profile routes
+          { path: "profile", element: <Profile /> },              // logged-in employee
+          { path: "employees/:id", element: <Profile /> },        // HR/Admin view
         ]
       },
       { path: "*", element: <NotFound /> } 

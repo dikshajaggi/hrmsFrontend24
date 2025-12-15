@@ -1,6 +1,7 @@
 // src/components/attendance/MonthNavigator.tsx
 import React from 'react';
 import "./attendance.css"
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const MONTH_NAMES = [
   'January',
@@ -50,16 +51,14 @@ export const AttendanceMonthNavigator = ({
   };
 
   return (
-    <div className="attendance-month-nav">
-      <button onClick={handlePrev} disabled={!canGoPrev}>
-         Prev
-      </button>
-      <div className="attendance-month-label">
+    <div className="flex items-center gap-1">
+      <ChevronLeft  className={`cursor-pointer transition-opacity duration-200
+    ${canGoPrev ? 'text-neutral-900 opacity-100' : 'text-neutral-400 opacity-40 pointer-events-none'}`} onClick={handlePrev} disabled={!canGoPrev} />
+      <div className="w-36 text-center font-semibold text-lg">
         {MONTH_NAMES[month]} {year}
       </div>
-      <button onClick={handleNext} disabled={!canGoNext}>
-        Next 
-      </button>
+      <ChevronRight  className={`cursor-pointer transition-opacity duration-200
+    ${canGoNext ? 'text-neutral-900 opacity-100' : 'text-neutral-400 opacity-40 pointer-events-none'}`} onClick={handleNext} disabled={!canGoNext} /> 
     </div>
   );
 };

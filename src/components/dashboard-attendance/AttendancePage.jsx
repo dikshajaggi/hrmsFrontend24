@@ -3,11 +3,12 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import {
   fetchAttendanceGrid,
   saveAttendanceBulk,
-} from '../apis/index';
+} from '../../apis/index';
 import { AttendanceMonthNavigator } from './AttendanceMonthNavigator';
 import { AttendanceLegend } from './AttendanceLegend';
 import { AttendanceGrid } from './AttendanceGrid';
 import "./attendance.css"
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 
 const MIN_YEAR = 2024;
@@ -172,9 +173,9 @@ export const AttendancePage = ({selectedBranch, selectedSite}) => {
   }, [pageSize]);
 
   return (
-    <div className="attendance-page">
-      <div className="attendance-page-header">
-        <h2 className='text-[18px]'>Attendance Sheet</h2>
+    <div className="flex flex-col p-6 mt-4 gap-4">
+      <div className="attendance-page-header mb-4">
+        <h2 className='text-xl font-semibold'>Attendance Sheet</h2>
         <AttendanceMonthNavigator
           month={month}
           year={year}
@@ -186,15 +187,16 @@ export const AttendancePage = ({selectedBranch, selectedSite}) => {
 
       <AttendanceLegend />
 
-      <div className="attendance-page-actions">
+      <div className="flex items-center gap-1 ml-auto">
         <button
+          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-pointer"
           onClick={handleSave}
           disabled={saving || !unsavedChanges}
         >
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
         {unsavedChanges && (
-          <span className="unsaved-indicator">
+          <span className="text-[#b91c1c] text-sm">
             ● Unsaved changes
           </span>
         )}
@@ -216,7 +218,7 @@ export const AttendancePage = ({selectedBranch, selectedSite}) => {
           disabled={page <= 1}
           onClick={() => setPage(p => Math.max(1, p - 1))}
         >
-          Prev
+          <ChevronLeft />
         </button>
         <span>
           Page {page} of {totalPages}
@@ -225,7 +227,7 @@ export const AttendancePage = ({selectedBranch, selectedSite}) => {
           disabled={page >= totalPages}
           onClick={() => setPage(p => Math.min(totalPages, p + 1))}
         >
-          Next
+          <ChevronRight />
         </button>
       </div>
     </div>

@@ -1,15 +1,17 @@
 import React, { useState, useMemo } from "react";
 import {
-  Mail,
   MapPin,
   MoreHorizontal,
   ArrowRight,
   X,
   Building2,
+  User,
 } from "lucide-react";
 import * as ReactWindow from "react-window";
-import SearchExportData from "./SearchExportData";
-import ExportDataModal from "./common/ExportDataModal";
+import SearchExportData from "../SearchExportData";
+import ExportDataModal from "../common/ExportDataModal";
+import { Drawer } from "../common/Drawer";
+import { WarningModal } from "../common/WarningModal";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -20,7 +22,7 @@ const CARD_HEIGHT = 240;
 const GRID_GAP = 20;
 
 
-const EmployeeCard = ({ emp, onSelect, style }) => {
+const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
   return (
     <div
       style={{
@@ -50,11 +52,11 @@ const EmployeeCard = ({ emp, onSelect, style }) => {
 
       {/* Profile Image */}
       <div className="flex justify-center">
-        <img
+        {emp.image ? <img
           src={emp.image || "https://via.placeholder.com/80"}
           alt={emp.name}
           className="w-14 h-14 rounded-full object-cover border border-gray-200"
-        />
+        /> : <User size={30} />}
       </div>
 
       {/* Name + Designation */}
@@ -82,14 +84,21 @@ const EmployeeCard = ({ emp, onSelect, style }) => {
       </div>
 
       {/* View Details */}
-      <div className="mt-5 flex justify-center">
-        <button
+      <div className="mt-5 flex justify-center items-center w-full">
+        <button  onClick={() => setShowEdit(true)} className="flex items-center font-medium text-blue-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
+          Edit
+        </button>
+         <button
           onClick={() => onSelect(emp)}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 cursor-pointer"
+          className="text-sm text-blue-600 hover:text-blue-700 px-3 font-medium flex items-center cursor-pointer"
         >
           View Details
-          <ArrowRight size={14} />
+          {/* <ArrowRight size={14} /> */}
         </button>
+         <button  onClick={() => setOpen(true)} className="flex items-center font-medium text-red-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
+          Delete
+        </button>
+       
       </div>
     </div>
   );
@@ -100,6 +109,14 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showEdit, setShowEdit] = useState(false)
+
+  const handleDelete = () => {
+
+  }
+
   // const navigate = useNavigate()
 
   const columnCount = useMemo(() => {
@@ -120,6 +137,8 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
         emp={emp}
         style={style}
         onSelect={setSelectedEmployee}
+        setShowEdit = {setShowEdit} 
+        setOpen = {setOpen}
       />
     );
   };
@@ -155,52 +174,35 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
         {Cell}
       </Grid>
 
+       <WarningModal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          onConfirm={handleDelete}
+          employeeName="Rahul Sharma"
+          loading={loading}
+        />
+        <Drawer
+          isOpen={showEdit}
+          onClose={() => setShowEdit(false)}
+          title="Edit Employee"
+          subtitle="Quick updates"
+        ></Drawer>
+
       {/* Slide-in Details Panel */}
-      {selectedEmployee && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex justify-end z-50">
-          <div className="bg-white w-full sm:w-[700px] h-full shadow-xl border-l border-gray-100 p-6 relative animate-slideIn flex flex-col">
-            
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <img
-                  src={selectedEmployee.image || "https://via.placeholder.com/80"}
-                  alt={selectedEmployee.name}
-                  className="w-16 h-16 rounded-full object-cover border"
-                />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">{selectedEmployee.name}</h3>
-                  <p className="text-sm text-gray-500">{selectedEmployee.designation.designation_name}</p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2">
-                {/* View full profile button */}
-                <button
-                  // onClick={() => navigate(`/employee/${selectedEmployee.id}`)}
-                  className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium cursor-not-allowed"
-                >
-                  Full Profile
-                  <ArrowRight size={14} />
-                </button>
-
-                {/* Close */}
-                <button
-                  onClick={() => setSelectedEmployee(null)}
-                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Tabs or summary content here */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Add mini tabs or summary info */}
-            </div>
-          </div>
-        </div>
-      )}
+      <Drawer
+        isOpen={!!selectedEmployee}
+        onClose={() => setSelectedEmployee(null)}
+        title={selectedEmployee?.name}
+        subtitle={selectedEmployee?.designation?.designation_name}
+        headerActions={
+          <button className="text-sm text-blue-600 font-medium">
+            Full Profile →
+          </button>
+        }
+      >
+        {/* Employee summary / tabs */}
+      </Drawer>
     </div>
   );
 };

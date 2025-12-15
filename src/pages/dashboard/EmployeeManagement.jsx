@@ -1,4 +1,4 @@
-import EmployeeList from "@/components/EmployeeList";
+import EmployeeList from "@/components/dashboard-employee/EmployeeList";
 import ImportDataModal from "@/components/common/ImportDataModal";
 import { Plus, Upload } from "lucide-react";
 import React, { useState } from "react";
