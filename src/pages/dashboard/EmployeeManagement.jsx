@@ -3,6 +3,7 @@ import ImportDataModal from "@/components/common/ImportDataModal";
 import { Plus, Upload } from "lucide-react";
 import React, { useState } from "react";
 import { useQueryClient } from "react-query";
+import { Link } from "react-router-dom";
 
 const EmployeeManagement = () => {
   const [showModal, setShowModal] = useState(false);
@@ -14,11 +15,13 @@ const EmployeeManagement = () => {
         <h1 className="text-2xl font-semibold mb-6">Employee Management</h1>
 
        <div className="flex flex-wrap gap-2">
-        <button
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-not-allowed"
-        >
-          <Plus size={16} /> Add Employee
-        </button>
+        <Link to = "/dashboard/add-new-employee">
+          <button
+            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition cursor-pointer"
+          >
+            <Plus size={16} /> Add Employee
+          </button>
+        </Link>
          <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 transition cursor-pointer"

@@ -12,6 +12,7 @@ import SearchExportData from "../SearchExportData";
 import ExportDataModal from "../common/ExportDataModal";
 import { Drawer } from "../common/Drawer";
 import { WarningModal } from "../common/WarningModal";
+import { Link } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -62,7 +63,9 @@ const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
       {/* Name + Designation */}
       <div className="text-center mt-3">
         <h4 className="text-[15px] font-semibold text-gray-800 flex items-center justify-center gap-1 flex-wrap">
-          {emp.name}
+          <Link to= {`/dashboard/employees/${emp?.job_details.employee_id}`}>
+              {emp.name}
+            </Link>
           {emp.designation && (
             <span className="text-sm font-normal text-gray-500">
               • {emp.designation.designation_name}
@@ -196,9 +199,11 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
         title={selectedEmployee?.name}
         subtitle={selectedEmployee?.designation?.designation_name}
         headerActions={
-          <button className="text-sm text-blue-600 font-medium">
-            Full Profile →
-          </button>
+          <Link to= {`/dashboard/employees/${selectedEmployee?.job_details.employee_id}`}>
+            <span className="text-sm text-blue-600 font-medium mr-6 cursor-pointer">
+              View Full Profile
+            </span>
+          </Link>
         }
       >
         {/* Employee summary / tabs */}

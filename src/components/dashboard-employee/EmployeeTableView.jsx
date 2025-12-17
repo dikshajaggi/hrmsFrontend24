@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 import ExportDataModal from "../common/ExportDataModal";
 import SearchExportData from "../SearchExportData";
-import { MoreVertical, Pencil, Trash, User } from "lucide-react";
+import { FileUser, MoreVertical, Pencil, Trash, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { WarningModal } from "../common/WarningModal";
 import { Drawer } from "../common/Drawer";
+import { Link } from "react-router-dom";
 
 
 const EmployeeTableView = ({ employees, filters, setFilters}) => {
@@ -26,6 +27,7 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [showEdit, setShowEdit] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   
+  console.log(employees, ":employeee")
 
   const data = useMemo(() => employees, [employees]);
 
@@ -75,6 +77,9 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
             ID
           </div>
         ),
+        cell: ({row}) => (
+          <span className="font-medium text-gray-800"> {row.original.job_details && row.original.job_details.employee_id}</span>
+        ),
         size: 60,
       },
       {
@@ -92,7 +97,9 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
               alt={row.original.name}
               className="w-8 h-8 rounded-full object-cover border border-gray-200"
             /> : <User />}
-            <span className="font-medium text-gray-800">{row.original.name}</span>
+            <Link to= {`/dashboard/employees/${row.original?.job_details.employee_id}`}>
+              <span className="font-medium text-gray-800">{row.original.name}</span>
+            </Link>
           </div>
         ),
         size: 200,
@@ -162,7 +169,7 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
                   onClick={() => setSelectedEmployee(employee)}
                   className="cursor-pointer text-blue-600 focus:text-blue-700"
                 >
-                  <Trash size={14} className="mr-2" />
+                  <FileUser size={14} className="mr-2" />
                   View Details
                 </DropdownMenuItem>
 
@@ -302,9 +309,11 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
           title={selectedEmployee?.name}
           subtitle={selectedEmployee?.designation?.designation_name}
           headerActions={
-            <button className="text-sm text-blue-600 font-medium">
-              Full Profile →
-            </button>
+            <Link to= {`/dashboard/employees/${selectedEmployee?.job_details.employee_id}`}>
+              <span className="text-sm text-blue-600 font-medium mr-6 cursor-pointer">
+                View Full Profile
+              </span>
+            </Link>
           }
         >
           {/* Employee summary / tabs */}

@@ -20,6 +20,7 @@ import {
 } from 'react-router-dom';
 import AssetManagement from '@/pages/dashboard/AssetManagement';
 import Profile from '@/pages/Profile';
+import AddEmployee from '@/pages/dashboard/AddEmployee';
 
 // Define routes as objects
 const router = createBrowserRouter([
@@ -66,6 +67,7 @@ const router = createBrowserRouter([
           // employee profile routes
           { path: "profile", element: <Profile /> },              // logged-in employee
           { path: "employees/:id", element: <Profile /> },        // HR/Admin view
+          { path: "add-new-employee", element: <AddEmployee />},
         ]
       },
       { path: "*", element: <NotFound /> } 
