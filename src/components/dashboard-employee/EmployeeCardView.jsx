@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   MapPin,
   MoreHorizontal,
@@ -13,6 +13,8 @@ import ExportDataModal from "../common/ExportDataModal";
 import { Drawer } from "../common/Drawer";
 import { WarningModal } from "../common/WarningModal";
 import { Link } from "react-router-dom";
+import EmployeeView from "./EmployeeView";
+import EmployeeEdit from "./EmployeeEdit";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -23,7 +25,7 @@ const CARD_HEIGHT = 240;
 const GRID_GAP = 20;
 
 
-const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
+const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen }) => {
   return (
     <div
       style={{
@@ -47,9 +49,9 @@ const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
       </span>
 
       {/* Menu Icon */}
-      <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+      {/* <button className="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
         <MoreHorizontal size={16} />
-      </button>
+      </button> */}
 
       {/* Profile Image */}
       <div className="flex justify-center">
@@ -88,11 +90,19 @@ const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
 
       {/* View Details */}
       <div className="mt-5 flex justify-center items-center w-full">
-        <button  onClick={() => setShowEdit(true)} className="flex items-center font-medium text-blue-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
+        <button 
+        onClick={() => {
+          setActiveEmployee(emp);
+          setDrawerMode("edit");
+        }}
+        className="flex items-center font-medium text-blue-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
           Edit
         </button>
          <button
-          onClick={() => onSelect(emp)}
+          onClick={() => {
+            setActiveEmployee(emp);
+            setDrawerMode("view");
+          }}
           className="text-sm text-blue-600 hover:text-blue-700 px-3 font-medium flex items-center cursor-pointer"
         >
           View Details
@@ -111,22 +121,30 @@ const EmployeeCard = ({ emp, onSelect, style, setShowEdit, setOpen }) => {
 const EmployeeCardView = ({ employees, filters, setFilters }) => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [showExport, setShowExport] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [activeEmployee, setActiveEmployee] = useState(null);
+  const [drawerMode, setDrawerMode] = useState("view"); 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showEdit, setShowEdit] = useState(false)
 
   const handleDelete = () => {
 
   }
 
   // const navigate = useNavigate()
-
-  const columnCount = useMemo(() => {
+  const getColumnCount = () => {
     if (window.innerWidth >= 1024) return 3;
     if (window.innerWidth >= 640) return 2;
     return 1;
+  };
+
+  const [columnCount, setColumnCount] = useState(getColumnCount());
+
+  useEffect(() => {
+    const handleResize = () => setColumnCount(getColumnCount());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
 
   const rowCount = Math.ceil(employees.length / columnCount);
 
@@ -139,8 +157,8 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
       <EmployeeCard
         emp={emp}
         style={style}
-        onSelect={setSelectedEmployee}
-        setShowEdit = {setShowEdit} 
+        setActiveEmployee={setActiveEmployee}
+        setDrawerMode = {setDrawerMode} 
         setOpen = {setOpen}
       />
     );
@@ -184,30 +202,43 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
           employeeName="Rahul Sharma"
           loading={loading}
         />
-        <Drawer
-          isOpen={showEdit}
-          onClose={() => setShowEdit(false)}
-          title="Edit Employee"
-          subtitle="Quick updates"
-        ></Drawer>
+       <Drawer
+          isOpen={!!activeEmployee}
+          onClose={() => {
+            setActiveEmployee(null);
+            setDrawerMode("view");
+          }}
+          title={drawerMode === "edit" ? "Edit Employee Profile" : "Employee Overview"}
+          subtitle={
+            drawerMode === "edit"
+              ? "Update role, organization, and personal details"
+              : "Profile summary and key information"
+          }
+          headerActions={
+            drawerMode === "view" && (
+              <button
+                onClick={() => setDrawerMode("edit")}
+                className="text-sm text-blue-600 font-medium mr-6 cursor-pointer"
+              >
+                Edit
+              </button>
+            )
+          }
+        >
+          {drawerMode === "view" ? (
+            <EmployeeView employee={activeEmployee} />
+          ) : (
+            <EmployeeEdit
+              employee={activeEmployee}
+              onCancel={() => setDrawerMode("view")}
+              onSave={() => {
+                // call update API
+                setDrawerMode("view");
+              }}
+            />
+          )}
+        </Drawer>
 
-      {/* Slide-in Details Panel */}
-
-      <Drawer
-        isOpen={!!selectedEmployee}
-        onClose={() => setSelectedEmployee(null)}
-        title={selectedEmployee?.name}
-        subtitle={selectedEmployee?.designation?.designation_name}
-        headerActions={
-          <Link to= {`/dashboard/employees/${selectedEmployee?.job_details.employee_id}`}>
-            <span className="text-sm text-blue-600 font-medium mr-6 cursor-pointer">
-              View Full Profile
-            </span>
-          </Link>
-        }
-      >
-        {/* Employee summary / tabs */}
-      </Drawer>
     </div>
   );
 };

@@ -99,3 +99,38 @@ export const RadioGroup = ({ label, options }) => {
     </div>
   );
 }
+
+
+export const Card = ({ title, children }) => (
+  <div className="bg-gray-50 rounded-xl p-4">
+    <h4 className="text-xs font-semibold text-gray-500 uppercase mb-4">
+      {title}
+    </h4>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {children}
+    </div>
+  </div>
+);
+
+export const Info = ({ label, value }) => (
+  <div>
+    <p className="text-xs text-gray-500">{label}</p>
+    <p className="text-sm font-medium text-gray-900 mt-1">
+      {value || "—"}
+    </p>
+  </div>
+);
+
+export const Badge = ({ children, tone = "gray" }) => {
+  const tones = {
+    gray: "bg-gray-100 text-gray-600",
+    green: "bg-green-100 text-green-700",
+  };
+  return (
+    <span
+      className={`text-xs px-2 py-0.5 rounded-full ${tones[tone]}`}
+    >
+      {children}
+    </span>
+  );
+};
