@@ -60,24 +60,23 @@ export const Input = ({ label, required, value, type = "text", placeholder, onCh
   );
 }
 
-export const Select = ({ label, required, options }) => {
+export const Select = ({ label, required, options, onChange, value, optionLabel, optionValue }) => {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
-      <select className="w-full rounded-lg border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-        {label === "Branch" && options && options.map(item => (
-            <option value={item.branch_name}>{item.branch_name}</option>
-        ))}
-        {label === "Department" && options && options.map(item => (
-            <option value={item.department_name}>{item.department_name}</option>
-        ))}
-        {label === "Designation" && options && options.map(item => (
-            <option value={item.designation_name}>{item.designation_name}</option>
-        ))}
-        {label === "Project Site" && options && options.map(item => (
-            <option value={item.site_name}>{item.site_name}</option>
+      <select className="w-full rounded-lg capitalize border px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        value={value ?? ""}  onChange={onChange ?? ""}>
+        <option value="">Select {label}</option>
+
+        {options.map((item) => (
+          <option
+            key={item[optionValue] ?? item}
+            value={item[optionValue] ?? item}
+          >
+            {item[optionLabel] ?? item}
+          </option>
         ))}
       </select>
     </div>

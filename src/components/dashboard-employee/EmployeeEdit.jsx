@@ -1,25 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge, Input, Select } from "../AddEmployeeReusable";
 import { User } from "lucide-react";
+import { getBranches, getDepartments, getDesignations, getProjectSites, updateEmployees } from "@/apis";
 
 export default function EmployeeEdit({
   employee,
-  branches,
-  departments,
-  designations,
-  projectSites,
   onCancel,
   onSave,
 }) {
+  const [branches, setBranches] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
+  const [projectSites, setProjectSites] = useState([]);
+  const employmentTypes = ["permanent", "contract", "consultant", "intern"] 
+
   const [form, setForm] = useState({
     name: employee.name || "",
-    branch_id: employee.branch_id || "",
-    department_id: employee.department_id || "",
-    designation_id: employee.designation_id || "",
-    project_site_id: employee.project_site_id || "",
+    branch_id: employee.branch?.branch_id || "",
+    department_id: employee.department?.department_id || "",
+    designation_id: employee.designation?.designation_id || "",
+    project_site_id: employee.projectSite?.site_id || "",
     job_details: {
-      notice_period_days:
-        employee.job_details?.notice_period_days ?? 0,
+      employment_type : employee.job_details?.employment_type ?? "permanent",
+      notice_period_days: employee.job_details?.notice_period_days ?? 0,
     },
     personal_details: {
       email: employee.personal_details?.email || "",
@@ -28,6 +31,28 @@ export default function EmployeeEdit({
   });
 
   const [loading, setLoading] = useState(false);
+
+   async function fetchMasters() {
+          try {
+              const [branchRes, designationRes, projectSiteRes,departments] = await Promise.all([
+                  getBranches(),
+                  getDesignations(),
+                  getProjectSites(),
+                  getDepartments()
+              ]);
+  
+              setBranches(branchRes.slice(1));
+              setDesignations(designationRes.slice(1));
+              setProjectSites(projectSiteRes.slice(1));
+              setDepartments(departments.slice(1))
+          } catch (err) {
+              console.error("Failed to load master data", err);
+          }
+      }
+  
+      useEffect(() => {
+          fetchMasters();
+      },[])
 
   const handleChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -42,19 +67,44 @@ export default function EmployeeEdit({
       },
     }));
   };
+const handleSubmit = async () => {
+  setLoading(true);
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-    //   await updateEmployee(employee.employee_id, form);
-      onSave(form);
+  try {
+    const payload = {
+      name: form.name || undefined,
+      branch_id: form.branch_id || undefined,
+      department_id: form.department_id || undefined,
+      designation_id: form.designation_id || undefined,
+      project_site_id: form.project_site_id || undefined,
+
+      personal_details:
+        form.personal_details &&
+        Object.values(form.personal_details).some(Boolean)
+          ? form.personal_details
+          : undefined,
+
+      job_details:
+        form.job_details &&
+        Object.values(form.job_details).some(
+          (v) => v !== null && v !== undefined
+        )
+          ? form.job_details
+          : undefined,
+    };
+
+      const res = await updateEmployees(employee.employee_id, payload);
+      console.log(res, "response.....")
+
+      onSave(payload); // optional optimistic update
     } catch (err) {
       console.error("Update failed", err);
       alert("Failed to update employee");
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
   return (
     <div className="space-y-6">
@@ -110,16 +160,16 @@ export default function EmployeeEdit({
           }
           optionLabel="department_name"
           optionValue="department_id"
-          disabled={!form.branch_id}
         />
 
         <Select
           label="Designation"
           options={designations}
           value={form.designation_id}
-          onChange={(e) =>
-            handleChange("designation_id", Number(e.target.value))
-          }
+          onChange={(e) =>{
+            console.log(e.target, e.target.value, "designation value");
+            handleChange("designation_id", Number(e.target.value));
+          }}
           optionLabel="designation_name"
           optionValue="designation_id"
         />
@@ -129,7 +179,7 @@ export default function EmployeeEdit({
           options={projectSites}
           value={form.project_site_id}
           onChange={(e) =>
-            handleChange("project_site_id", Number(e.target.value))
+            handleChange("project_site_id",Number(e.target.value))
           }
           optionLabel="site_name"
           optionValue="site_id"
@@ -150,6 +200,16 @@ export default function EmployeeEdit({
               Math.max(0, Number(e.target.value))
             )
           }
+        />
+        <Select
+          label="Employment Type"
+          options={employmentTypes}
+          value={form.job_details.employment_type}
+          onChange={(e) =>
+            handleChange("employment_type", e.target.value)
+          }
+          optionLabel="employment_type"
+          optionValue="employment_type"
         />
       </Section>
 

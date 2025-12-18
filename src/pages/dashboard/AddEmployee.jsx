@@ -10,9 +10,6 @@ export default function AddEmployee() {
     const [projectSites, setProjectSites] = useState([]);
     const [noticePeriod, setNoticePeriod] = useState(0);
 
-
-    const [selectedBranch, setSelectedBranch] = useState("");
-
     const handleNoticePeriod = (e) => {
         const value = e.target.value;
 

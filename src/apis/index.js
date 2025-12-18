@@ -155,3 +155,13 @@ export const getEmployees = async () => {
   const res = await api.get("/emp");
   return res.data.data;
 };
+
+export const updateEmployees = async (id, payload) => {
+  const res = await api.patch(`/emp/${id}`, payload);
+  return res.data.data;
+}
+
+export const deleteEmployees = async (id) => {
+  const res = await api.delete(`/emp/${id}`);
+  return res.data.data;
+}

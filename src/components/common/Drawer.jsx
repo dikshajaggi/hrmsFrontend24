@@ -9,7 +9,6 @@ export const Drawer = ({
   headerActions,
   children,
 }) => {
-  console.log(title, subtitle, "title,subtitle")
   if (!isOpen) return null;
 
   return (

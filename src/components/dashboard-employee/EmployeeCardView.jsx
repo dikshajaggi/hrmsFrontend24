@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   MapPin,
   MoreHorizontal,
@@ -15,6 +15,7 @@ import { WarningModal } from "../common/WarningModal";
 import { Link } from "react-router-dom";
 import EmployeeView from "./EmployeeView";
 import EmployeeEdit from "./EmployeeEdit";
+import { deleteEmployees } from "@/apis";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -25,7 +26,7 @@ const CARD_HEIGHT = 240;
 const GRID_GAP = 20;
 
 
-const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen }) => {
+const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen, setOpenDrawer }) => {
   return (
     <div
       style={{
@@ -93,6 +94,7 @@ const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen })
         <button 
         onClick={() => {
           setActiveEmployee(emp);
+          setOpenDrawer(true)
           setDrawerMode("edit");
         }}
         className="flex items-center font-medium text-blue-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
@@ -101,6 +103,7 @@ const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen })
          <button
           onClick={() => {
             setActiveEmployee(emp);
+            setOpenDrawer(true)
             setDrawerMode("view");
           }}
           className="text-sm text-blue-600 hover:text-blue-700 px-3 font-medium flex items-center cursor-pointer"
@@ -108,7 +111,10 @@ const EmployeeCard = ({ emp, style, setActiveEmployee, setDrawerMode, setOpen })
           View Details
           {/* <ArrowRight size={14} /> */}
         </button>
-         <button  onClick={() => setOpen(true)} className="flex items-center font-medium text-red-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
+         <button  onClick={() => {
+          setActiveEmployee(emp);
+          setOpen(true)
+         }} className="flex items-center font-medium text-red-600 px-3 py-2 rounded-lg text-sm transition cursor-pointer">
           Delete
         </button>
        
@@ -125,9 +131,16 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
   const [drawerMode, setDrawerMode] = useState("view"); 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false)
 
-  const handleDelete = () => {
-
+  const handleDelete = async () => {
+    try {
+      const res = await deleteEmployees(activeEmployee.employee_id)
+      setActiveEmployee(null)
+      console.log(res, "response")
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   // const navigate = useNavigate()
@@ -158,6 +171,7 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
         emp={emp}
         style={style}
         setActiveEmployee={setActiveEmployee}
+        setOpenDrawer = {setOpenDrawer}
         setDrawerMode = {setDrawerMode} 
         setOpen = {setOpen}
       />
@@ -195,16 +209,17 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
         {Cell}
       </Grid>
 
-       <WarningModal
+        {activeEmployee && <WarningModal
           isOpen={open}
           onClose={() => setOpen(false)}
           onConfirm={handleDelete}
-          employeeName="Rahul Sharma"
+          employeeName={activeEmployee.name}
           loading={loading}
-        />
+        />}
        <Drawer
-          isOpen={!!activeEmployee}
+          isOpen={openDrawer}
           onClose={() => {
+            setOpenDrawer(false)
             setActiveEmployee(null);
             setDrawerMode("view");
           }}
