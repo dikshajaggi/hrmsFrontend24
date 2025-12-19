@@ -1,4 +1,4 @@
-import { getBranches, getDepartments, getDesignations, getProjectSites } from "@/apis";
+import { createEmployee, getBranches, getDepartments, getDesignations, getProjectSites } from "@/apis";
 import { Grid, Input, RadioGroup, Section, Select } from "@/components/AddEmployeeReusable";
 import { useEffect, useState } from "react";
 
@@ -8,33 +8,80 @@ export default function AddEmployee() {
     const [departments, setDepartments] = useState([]);
     const [designations, setDesignations] = useState([]);
     const [projectSites, setProjectSites] = useState([]);
-    const [noticePeriod, setNoticePeriod] = useState(0);
+    
+    const employmentTypes = ["permanent", "contract", "consultant", "intern"] 
+    const maritalStatus = ["married", "single"]
+    const genderTypes = ["male", "female"]
 
-    const handleNoticePeriod = (e) => {
-        const value = e.target.value;
+    const [form, setForm] = useState({
+      name: "",
+      dob: "",
+      employee_code: "",
+      gender: "",
+      date_of_joining: "",
+      branch_id: "",
+      department_id: "",
+      designation_id: "",
+      project_site_id: "",
+      job_details: {
+        employment_type : "",
+        notice_period_days: null,
+        probation_period: null,
+      },
+      personal_details: {
+        email: "",
+        contact: "",
+        marital_status: ""
+      },
+    });
 
-        if (value === "") {
-        setNoticePeriod("");
-        return;
-        }
+    const handleNestedChange = (section, key, value) => {
+      setForm((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [key]: value,
+        },
+      }));
+    };
 
-        const numericValue = Number(value);
-
-        if (numericValue >= 0) {
-        setNoticePeriod(numericValue);
-        }
+    const handleChange = (key, value) => {
+      setForm((prev) => ({ ...prev, [key]: value }));
     }
 
-
-    async function fetchSettings() {
-        try {
-        // const res = await getHRSettings(); 
-        // setNoticePeriod(res.default_notice_period_days);
-        setNoticePeriod(60)
-        } catch (err) {
-        console.error("Failed to fetch HR settings", err);
+    const handleSubmit = async (e) => {    
+      e.preventDefault()
+      console.log(form, "form chek chekc")
+      try {
+        const payload = {
+          name: form.name,
+          dob: form.dob,
+          gender: form.gender,
+          employee_code: form.employee_code,
+          date_of_joining: form.date_of_joining,
+          branch_id: form.branch_id,
+          department_id: form.department_id,
+          designation_id: form.designation_id,
+          project_site_id: form.project_site_id,
+          job_details: {
+            employment_type : form.job_details.employment_type,
+            notice_period_days: form.job_details.notice_period_days,
+            probation_period: form.job_details.probation_period,
+          },
+          personal_details: {
+            email: form.personal_details.email,
+            contact: form.personal_details.contact,
+            marital_status: form.personal_details.marital_status,
+          },
         }
-    }
+    
+          const res = await createEmployee(payload);
+          console.log(res, "response.....")
+            } catch (err) {
+          console.error("Creation failed", err);
+          alert("Failed to add employee");
+        } 
+    };
 
     async function fetchMasters() {
         try {
@@ -55,8 +102,7 @@ export default function AddEmployee() {
     }
 
     useEffect(() => {
-        fetchMasters();
-        fetchSettings()
+        fetchMasters()
     }, []);
 
 
@@ -79,32 +125,110 @@ export default function AddEmployee() {
         {/* SECTION 1: BASIC DETAILS */}
         <Section title="Basic Details">
           <Grid>
-            <Input label="Employee Code" required />
-            <Input label="Full Name" required />
-            <Input label="Date of Joining" type="date" required />
+            <Input label="Employee Code" onChange={(e) => handleChange("employee_code", e.target.value)} required />
+            <Input label="Full Name" onChange={(e) => handleChange("name", e.target.value)} required />
+            <Input label="Date of Joining" type="date" onChange={(e) => {
+              const value = e.target.value;
+              handleChange("date_of_joining", new Date(value))}
+             } required />
+             <Select label="Gender" options = {genderTypes} 
+              value={form.gender} 
+              onChange={(e) => handleChange("gender", e.target.value)}  
+              optionLabel="gender"
+              optionValue="gender"
+            />
+            <Input label="Date of Birth" type="date"  onChange={(e) =>  {
+                const value = e.target.value;
+                handleChange("dob", new Date(value))
+              }}
+            />
           </Grid>
         </Section>
         {/* SECTION 2: ORGANIZATION DETAILS */}
         <Section title="Organization Details">
           <Grid>
-            <Select label="Branch" options={branches.slice(1)} required /> 
-            <Select label="Department" options={departments.slice(1)} />
-            <Select label="Designation" options={designations.slice(1)} />
-            <Select label="Project Site" options={projectSites.slice(1)} />
+            <Select
+            label="Branch"
+            options={branches}
+            value={form.branch_id}
+            onChange={(e) =>
+              handleChange("branch_id", Number(e.target.value))
+            }
+            optionLabel="branch_name"
+            optionValue="branch_id"
+          />
+  
+          <Select
+            label="Department"
+            options={departments}
+            value={form.department_id}
+            onChange={(e) =>
+              handleChange("department_id", Number(e.target.value))
+            }
+            optionLabel="department_name"
+            optionValue="department_id"
+          />
+  
+          <Select
+            label="Designation"
+            options={designations}
+            value={form.designation_id}
+            onChange={(e) =>{
+              console.log(e.target, e.target.value, "designation value");
+              handleChange("designation_id", Number(e.target.value));
+            }}
+            optionLabel="designation_name"
+            optionValue="designation_id"
+          />
+  
+          <Select
+            label="Project Site"
+            options={projectSites}
+            value={form.project_site_id}
+            onChange={(e) =>
+              handleChange("project_site_id",Number(e.target.value))
+            }
+            optionLabel="site_name"
+            optionValue="site_id"
+          />
           </Grid>
         </Section>
 
         {/* SECTION 3: JOB DETAILS */}
         <Section title="Job Details">
           <Grid>
-            <RadioGroup
+            <Select
               label="Employment Type"
-              options={["Permanent", "Contract", "Intern"]}
+              options={employmentTypes}
+              value={form.job_details.employment_type}
+              onChange={(e) =>
+                handleNestedChange("job_details", "employment_type", e.target.value)
+              }
+              optionLabel="employment_type"
+              optionValue="employment_type"
             />
-            <Input label="Reporting Manager" placeholder="Enter name" />
-            <Input label="Probation Period" placeholder="e.g. 6 months" />
+            <Input label="Probation Period" type="text" placeholder="e.g. 6 months" value={form.job_details.probation_period} 
+            onChange={(e) =>
+              handleNestedChange(
+                "job_details",
+                "probation_period",
+                e.target.value
+              )
+            }/>
             <div>
-                <Input label="Notice Period (days)" type="number"  min={0} value={noticePeriod} onChange={handleNoticePeriod}/>
+                <Input
+                  label="Notice Period (days)"
+                  type="number"
+                  min={0}
+                  value={form.job_details.notice_period_days}
+                  onChange={(e) =>
+                    handleNestedChange(
+                      "job_details",
+                      "notice_period_days",
+                      Math.max(0, Number(e.target.value))
+                    )
+                  }
+                />
                 <p className="text-xs text-gray-500 mt-1">Default value is set from HR settings</p>
             </div>
           </Grid>
@@ -119,11 +243,15 @@ export default function AddEmployee() {
           badge="Optional"
         >
           <Grid>
-            <Input label="Phone Number" />
-            <Input label="Email" type="email" />
-            <Select label="Gender" />
-            <Input label="Date of Birth" type="date" />
-            <Select label="Marital Status" />
+            <Input label="Phone Number" onChange={(e) => handleNestedChange("personal_details", "contact", e.target.value)} />
+            <Input label="Email" type="email" onChange={(e) => handleNestedChange("personal_details", "email", e.target.value)}/>
+            <Select label="Marital Status" 
+              value={form.personal_details.marital_status} 
+              options={maritalStatus} 
+              onChange={(e) => handleNestedChange("personal_details", "marital_status", e.target.value)} 
+              optionLabel="marital_status"
+              optionValue="marital_status"
+            />
           </Grid>
         </Section>
 
@@ -138,6 +266,7 @@ export default function AddEmployee() {
           <button
             type="submit"
             className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            onClick={(e) => handleSubmit(e)}
           >
             Create Employee
           </button>

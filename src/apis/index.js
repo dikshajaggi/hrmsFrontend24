@@ -165,3 +165,13 @@ export const deleteEmployees = async (id) => {
   const res = await api.delete(`/emp/${id}`);
   return res.data.data;
 }
+
+export const createEmployee = async (payload) => {
+  const res = await api.post("/emp", payload);
+  return res.data.data;
+}
+
+export const searchEmployees = async (q) => {
+  const res = await api.get(`/emp/search/${q}`);
+  return res.data.data;
+}
