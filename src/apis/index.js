@@ -172,6 +172,11 @@ export const createEmployee = async (payload) => {
 }
 
 export const searchEmployees = async (q) => {
-  const res = await api.get(`/emp/search/${q}`);
+  if (!q || q.trim().length < 2) return [];
+
+  const res = await api.get("/emp/search", {
+    params: { q: q.trim() }
+  });
+
   return res.data.data;
 }

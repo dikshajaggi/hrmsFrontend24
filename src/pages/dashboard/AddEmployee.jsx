@@ -208,12 +208,12 @@ export default function AddEmployee() {
               optionValue="employment_type"
             />
             <Input label="Probation Period" type="text" placeholder="e.g. 6 months" value={form.job_details.probation_period} 
-            onChange={(e) =>
-              handleNestedChange(
-                "job_details",
-                "probation_period",
-                e.target.value
-              )
+              onChange={(e) =>
+                handleNestedChange(
+                  "job_details",
+                  "probation_period",
+                  e.target.value
+                )
             }/>
             <div>
                 <Input
