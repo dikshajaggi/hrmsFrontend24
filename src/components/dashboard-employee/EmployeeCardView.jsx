@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 import EmployeeView from "./EmployeeView";
 import EmployeeEdit from "./EmployeeEdit";
 import { deleteEmployees } from "@/apis";
+import { useQueryClient } from "react-query";
+import toast from "react-hot-toast";
 // import { useNavigate } from "react-router-dom";
 
 
@@ -132,14 +134,22 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false)
+  const [searched, setSearched] = useState("")
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     try {
       const res = await deleteEmployees(activeEmployee.employee_id)
-      setActiveEmployee(null)
+      console.log(res, "respnseeee", res.status)
+      if (res.status === 200) {
+        setActiveEmployee(null)
+        queryClient.invalidateQueries(["employees"]);
+        toast.success("Employee deleted Successfully!")
+      }
       console.log(res, "response")
     } catch (error) {
       console.log(error)
+      toast.error("Unable to delete employee")
     }
   }
 
@@ -180,7 +190,7 @@ const EmployeeCardView = ({ employees, filters, setFilters }) => {
 
   return (
     <div className="relative w-full">
-      <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} />
+      <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} setSearched = {setSearched} />
       
       {showExport && (
         <ExportDataModal 

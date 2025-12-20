@@ -1,14 +1,19 @@
 import { searchEmployees } from '@/apis'
 import { Import, Search } from 'lucide-react'
 import React, { useEffect } from 'react'
+import toast from 'react-hot-toast'
 
-const SearchExportData = ({globalFilter, setGlobalFilter, setShowExport}) => {
+const SearchExportData = ({globalFilter, setGlobalFilter, setShowExport, setSearched}) => {
   console.log(globalFilter, "global filter")
 
-  const handleSearch = (searchValue) => {
+  const handleSearch = async(searchValue) => {
     // apply debouncing
-    const res = searchEmployees(searchValue)
-    return res
+    const res = await searchEmployees(searchValue)
+    if(res.length > 0) setSearched(res[0])
+    else {
+      toast.error("Unable to find the searched value")
+      setGlobalFilter("")
+    }
   }
 
   useEffect(() => {

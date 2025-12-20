@@ -1,6 +1,8 @@
 import { createEmployee, getBranches, getDepartments, getDesignations, getProjectSites } from "@/apis";
 import { Grid, Input, RadioGroup, Section, Select } from "@/components/AddEmployeeReusable";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { QueryClient, useQueryClient } from "react-query";
 
 export default function AddEmployee() {
     const [showPersonal, setShowPersonal] = useState(false);
@@ -8,6 +10,7 @@ export default function AddEmployee() {
     const [departments, setDepartments] = useState([]);
     const [designations, setDesignations] = useState([]);
     const [projectSites, setProjectSites] = useState([]);
+    const queryClient = useQueryClient();
     
     const employmentTypes = ["permanent", "contract", "consultant", "intern"] 
     const maritalStatus = ["married", "single"]
@@ -51,7 +54,6 @@ export default function AddEmployee() {
 
     const handleSubmit = async (e) => {    
       e.preventDefault()
-      console.log(form, "form chek chekc")
       try {
         const payload = {
           name: form.name,
@@ -76,10 +78,34 @@ export default function AddEmployee() {
         }
     
           const res = await createEmployee(payload);
-          console.log(res, "response.....")
-            } catch (err) {
+          if(res.status === 201) {
+            setForm({
+              name: "",
+              dob: "",
+              employee_code: "",
+              gender: "",
+              date_of_joining: "",
+              branch_id: "",
+              department_id: "",
+              designation_id: "",
+              project_site_id: "",
+              job_details: {
+                employment_type : "",
+                notice_period_days: null,
+                probation_period: null,
+              },
+              personal_details: {
+                email: "",
+                contact: "",
+                marital_status: ""
+              },
+            })
+            toast.success("Successfully created!")
+            queryClient.invalidateQueries(["employees"]);
+          }
+          } catch (err) {
           console.error("Creation failed", err);
-          alert("Failed to add employee");
+          toast.error("Failed to add employee");
         } 
     };
 
@@ -125,9 +151,9 @@ export default function AddEmployee() {
         {/* SECTION 1: BASIC DETAILS */}
         <Section title="Basic Details">
           <Grid>
-            <Input label="Employee Code" onChange={(e) => handleChange("employee_code", e.target.value)} required />
-            <Input label="Full Name" onChange={(e) => handleChange("name", e.target.value)} required />
-            <Input label="Date of Joining" type="date" onChange={(e) => {
+            <Input label="Employee Code" value={form.employee_code} onChange={(e) => handleChange("employee_code", e.target.value)} required />
+            <Input label="Full Name" value={form.name} onChange={(e) => handleChange("name", e.target.value)} required />
+            <Input label="Date of Joining"   value={form.date_of_joining ? form.date_of_joining.toISOString().split("T")[0] : ""} type="date" onChange={(e) => {
               const value = e.target.value;
               handleChange("date_of_joining", new Date(value))}
              } required />
@@ -137,7 +163,7 @@ export default function AddEmployee() {
               optionLabel="gender"
               optionValue="gender"
             />
-            <Input label="Date of Birth" type="date"  onChange={(e) =>  {
+            <Input label="Date of Birth" type="date" value={form.dob ? form.dob.toISOString().split("T")[0] : ""} onChange={(e) =>  {
                 const value = e.target.value;
                 handleChange("dob", new Date(value))
               }}
@@ -207,7 +233,7 @@ export default function AddEmployee() {
               optionLabel="employment_type"
               optionValue="employment_type"
             />
-            <Input label="Probation Period" type="text" placeholder="e.g. 6 months" value={form.job_details.probation_period} 
+            <Input label="Probation Period" type="text" placeholder="e.g. 6 months" value={form.job_details.probation_period ? form.job_details.probation_period : ""} 
               onChange={(e) =>
                 handleNestedChange(
                   "job_details",
@@ -220,7 +246,7 @@ export default function AddEmployee() {
                   label="Notice Period (days)"
                   type="number"
                   min={0}
-                  value={form.job_details.notice_period_days}
+                  value={form.job_details.notice_period_days ? form.job_details.notice_period_days  : 0}
                   onChange={(e) =>
                     handleNestedChange(
                       "job_details",
@@ -243,8 +269,8 @@ export default function AddEmployee() {
           badge="Optional"
         >
           <Grid>
-            <Input label="Phone Number" onChange={(e) => handleNestedChange("personal_details", "contact", e.target.value)} />
-            <Input label="Email" type="email" onChange={(e) => handleNestedChange("personal_details", "email", e.target.value)}/>
+            <Input label="Phone Number" value={form.personal_details.contact} onChange={(e) => handleNestedChange("personal_details", "contact", e.target.value)} />
+            <Input label="Email" type="email" value={form.personal_details.email} onChange={(e) => handleNestedChange("personal_details", "email", e.target.value)}/>
             <Select label="Marital Status" 
               value={form.personal_details.marital_status} 
               options={maritalStatus} 

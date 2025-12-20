@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Badge, Input, Select } from "../AddEmployeeReusable";
 import { User } from "lucide-react";
 import { getBranches, getDepartments, getDesignations, getProjectSites, updateEmployees } from "@/apis";
+import toast from "react-hot-toast";
+import { useQueryClient } from "react-query";
 
 export default function EmployeeEdit({
   employee,
@@ -12,6 +14,7 @@ export default function EmployeeEdit({
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [projectSites, setProjectSites] = useState([]);
+  const queryClient = useQueryClient();
   const employmentTypes = ["permanent", "contract", "consultant", "intern"] 
 
   const [form, setForm] = useState({
@@ -95,11 +98,13 @@ const handleSubmit = async () => {
 
       const res = await updateEmployees(employee.employee_id, payload);
       console.log(res, "response.....")
-
-      onSave(payload); // optional optimistic update
+      if (res.status === 200) {
+        toast.success("Successfully edited!")
+        queryClient.invalidateQueries(["employees"]);
+      }
     } catch (err) {
       console.error("Update failed", err);
-      alert("Failed to update employee");
+      toast.error("Successfully created!")("Failed to update employee");
     } finally {
       setLoading(false);
     }
@@ -252,7 +257,7 @@ const handleSubmit = async () => {
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 cursor-pointer"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>

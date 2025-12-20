@@ -26,6 +26,8 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [loading, setLoading] = useState(false);
   const [showEdit, setShowEdit] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [searched, setSearched] = useState("")
+  
   
   console.log(employees, ":employeee")
 
@@ -204,7 +206,7 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
   return (
     <div className="w-full bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
       {/* Toolbar */}
-      <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} />
+      <SearchExportData globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} setShowExport={setShowExport} setSearched = {setSearched} />
 
       {showExport && (
          <ExportDataModal 
