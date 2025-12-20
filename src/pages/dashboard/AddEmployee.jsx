@@ -118,10 +118,10 @@ export default function AddEmployee() {
                 getDepartments()
             ]);
 
-            setBranches(branchRes);
-            setDesignations(designationRes);
-            setProjectSites(projectSiteRes);
-            setDepartments(departments)
+            setBranches(branchRes.slice(1));
+            setDesignations(designationRes.slice(1));
+            setProjectSites(projectSiteRes.slice(1));
+            setDepartments(departments.slice(1))
         } catch (err) {
             console.error("Failed to load master data", err);
         }
@@ -151,8 +151,8 @@ export default function AddEmployee() {
         {/* SECTION 1: BASIC DETAILS */}
         <Section title="Basic Details">
           <Grid>
-            <Input label="Employee Code" value={form.employee_code} onChange={(e) => handleChange("employee_code", e.target.value)} required />
-            <Input label="Full Name" value={form.name} onChange={(e) => handleChange("name", e.target.value)} required />
+            <Input label="Employee Code" placeholder="enter emp code"  value={form.employee_code} onChange={(e) => handleChange("employee_code", e.target.value)} required />
+            <Input label="Full Name" value={form.name} placeholder="enter full name" onChange={(e) => handleChange("name", e.target.value)} required />
             <Input label="Date of Joining"   value={form.date_of_joining ? form.date_of_joining.toISOString().split("T")[0] : ""} type="date" onChange={(e) => {
               const value = e.target.value;
               handleChange("date_of_joining", new Date(value))}
@@ -269,8 +269,8 @@ export default function AddEmployee() {
           badge="Optional"
         >
           <Grid>
-            <Input label="Phone Number" value={form.personal_details.contact} onChange={(e) => handleNestedChange("personal_details", "contact", e.target.value)} />
-            <Input label="Email" type="email" value={form.personal_details.email} onChange={(e) => handleNestedChange("personal_details", "email", e.target.value)}/>
+            <Input label="Phone Number" placeholder="enter phone number" value={form.personal_details.contact} onChange={(e) => handleNestedChange("personal_details", "contact", e.target.value)} />
+            <Input label="Email" placeholder="enter email"  type="email" value={form.personal_details.email} onChange={(e) => handleNestedChange("personal_details", "email", e.target.value)}/>
             <Select label="Marital Status" 
               value={form.personal_details.marital_status} 
               options={maritalStatus} 

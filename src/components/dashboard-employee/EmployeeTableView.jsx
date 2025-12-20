@@ -17,6 +17,11 @@ import {
 import { WarningModal } from "../common/WarningModal";
 import { Drawer } from "../common/Drawer";
 import { Link } from "react-router-dom";
+import { deleteEmployees } from "@/apis";
+import { useQueryClient } from "react-query";
+import toast from "react-hot-toast";
+import EmployeeView from "./EmployeeView";
+import EmployeeEdit from "./EmployeeEdit";
 
 
 const EmployeeTableView = ({ employees, filters, setFilters}) => {
@@ -27,14 +32,30 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
   const [showEdit, setShowEdit] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [searched, setSearched] = useState("")
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const [drawerMode, setDrawerMode] = useState("view"); 
+  const queryClient = useQueryClient();
   
   
   console.log(employees, ":employeee")
 
   const data = useMemo(() => employees, [employees]);
 
-  const handleDelete = () => {
-
+  
+  const handleDelete = async () => {
+    try {
+      const res = await deleteEmployees(selectedEmployee.employee_id)
+      console.log(res, "respnseeee", res.status)
+      if (res.status === 200) {
+        setSelectedEmployee(null)
+        queryClient.invalidateQueries(["employees"]);
+        toast.success("Employee deleted Successfully!")
+      }
+      console.log(res, "response")
+    } catch (error) {
+      console.log(error)
+      toast.error("Unable to delete employee")
+    }
   }
 
   // 🔹 Define columns with icons where appropriate
@@ -160,7 +181,11 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
 
               <DropdownMenuContent align="end" className="w-32">
                 <DropdownMenuItem
-                  onClick={() => setShowEdit(true)}
+                  onClick={() => {
+                    setSelectedEmployee(employee)
+                    setShowEdit(true)
+                    setOpenDrawer(true)
+                  }}
                   className="cursor-pointer text-blue-600 focus:text-blue-700"
                 >
                   <Pencil size={14} className="mr-2" />
@@ -168,7 +193,10 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
                 </DropdownMenuItem>
 
                  <DropdownMenuItem
-                  onClick={() => setSelectedEmployee(employee)}
+                  onClick={() => {
+                    setOpenDrawer(true)
+                    setSelectedEmployee(employee)}
+                  }
                   className="cursor-pointer text-blue-600 focus:text-blue-700"
                 >
                   <FileUser size={14} className="mr-2" />
@@ -176,7 +204,10 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                  onClick={() => setOpen(true)}
+                  onClick={() => {
+                    setSelectedEmployee(employee)
+                    setOpen(true)}
+                  }
                   className="cursor-pointer text-red-600 focus:text-red-600"
                 >
                   <Trash size={14} className="mr-2" />
@@ -289,36 +320,50 @@ const EmployeeTableView = ({ employees, filters, setFilters}) => {
           Next
         </button>
       </div>
-      <WarningModal
+      {console.log(selectedEmployee, "selectedEmployee")}
+      {selectedEmployee && <WarningModal
         isOpen={open}
         onClose={() => setOpen(false)}
         onConfirm={handleDelete}
-        employeeName="Rahul Sharma"
+        employeeName={selectedEmployee.name}
         loading={loading}
-      />
-      <Drawer
-        isOpen={showEdit}
-        onClose={() => setShowEdit(false)}
-        title="Edit Employee"
-        subtitle="Quick updates"
-      >
-        {/* <EditEmployeeForm employee={selectedEmployee} /> */}
-      </Drawer>
-
-       <Drawer
-          isOpen={!!selectedEmployee}
-          onClose={() => setSelectedEmployee(null)}
-          title={selectedEmployee?.name}
-          subtitle={selectedEmployee?.designation?.designation_name}
+      />}
+        <Drawer
+          isOpen={openDrawer}
+          onClose={() => {
+            setOpenDrawer(false)
+            setSelectedEmployee(null);
+            setDrawerMode("view");
+          }}
+          title={drawerMode === "edit" ? "Edit Employee Profile" : "Employee Overview"}
+          subtitle={
+            drawerMode === "edit"
+              ? "Update role, organization, and personal details"
+              : "Profile summary and key information"
+          }
           headerActions={
-            <Link to= {`/dashboard/employees/${selectedEmployee?.job_details.employee_id}`}>
-              <span className="text-sm text-blue-600 font-medium mr-6 cursor-pointer">
-                View Full Profile
-              </span>
-            </Link>
+            drawerMode === "view" && (
+              <button
+                onClick={() => setDrawerMode("edit")}
+                className="text-sm text-blue-600 font-medium mr-6 cursor-pointer"
+              >
+                Edit
+              </button>
+            )
           }
         >
-          {/* Employee summary / tabs */}
+          {drawerMode === "view" ? (
+            <EmployeeView employee={selectedEmployee} />
+          ) : (
+            <EmployeeEdit
+              employee={selectedEmployee}
+              onCancel={() => setDrawerMode("view")}
+              onSave={() => {
+                // call update API
+                setDrawerMode("view");
+              }}
+            />
+          )}
         </Drawer>
 
     </div>
